@@ -1,0 +1,13 @@
+{
+  "name": "all-most",
+  "private": true,
+  "version": "0.1.0",
+  "workspaces": ["apps/*"],
+  "scripts": {
+    "dev": "concurrently -n web,api \"npm run dev -w @all-most/web\" \"npm run dev -w @all-most/api\"",
+    "build": "npm run build -w @all-most/web"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1"
+  }
+}

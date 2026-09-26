@@ -1,0 +1,6 @@
+:root { font-family: system-ui, sans-serif; color: #23263a; background: #f7f4ef; }
+body { margin: 0; }
+main { box-sizing: border-box; min-height: 100vh; display: grid; align-content: center; justify-items: center; padding: 2rem; text-align: center; }
+h1 { margin: 0; font-size: clamp(3rem, 10vw, 6rem); }
+p { line-height: 1.5; }
+.eyebrow { letter-spacing: .14em; text-transform: uppercase; font-size: .75rem; }
