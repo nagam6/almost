@@ -3,6 +3,7 @@ import AppLayout from "./components/AppLayout";
 import HomePage from "./pages/HomePage";
 import MuseumPage from "./pages/MuseumPage";
 import NotFoundPage from "./pages/NotFoundPage";
+import ExhibitPage from "./pages/ExhibitPage";
 import MuseumRoomPage from "./pages/MuseumRoomPage";
 export default function App() {
   return (
@@ -12,6 +13,7 @@ export default function App() {
         <Route path="/museum" element={<MuseumPage />} />
         <Route path="*" element={<NotFoundPage />} />
         <Route path="/museum/:roomId"element={<MuseumRoomPage />} />
+        <Route path="/museum/exhibits/:exhibitId"element={<ExhibitPage />} />
       </Routes>
     </AppLayout>
   );
