@@ -4,6 +4,7 @@ import mongoose from "mongoose";
 import { fileURLToPath } from "node:url";
 import { connectDB } from "./config/db.js";
 import roomsRouter from "./routes/roomRoutes.js";
+import exhibitRoutes from "./routes/exhibitRoutes.js";
 
 dotenv.config({
   path: fileURLToPath(new URL("../.env", import.meta.url)),
@@ -15,6 +16,7 @@ const app = express();
 app.use(express.json());
 
 app.use("/api/rooms", roomsRouter);
+app.use("/api/exhibits", exhibitRoutes);
 
 app.get("/api/health", (_request, response) => {
   const isConnected = mongoose.connection.readyState === 1;
