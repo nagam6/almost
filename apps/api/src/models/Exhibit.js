@@ -26,6 +26,18 @@ const exhibitSchema = new mongoose.Schema(
       lowercase: true,
     },
 
+    version: {
+      type: Number,
+      required: true,
+      default: 1,
+      min: 1,
+      immutable: true,
+      validate: {
+        validator: Number.isInteger,
+        message: "Exhibit version must be an integer.",
+      },
+    },
+
     roomSlug: {
       type: String,
       required: true,
@@ -110,5 +122,13 @@ const exhibitSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
+
+// Supports the published exhibits query for each room.
+exhibitSchema.index({
+  roomSlug: 1,
+  status: 1,
+  number: 1,
+  slug: 1,
+});
 
 export default mongoose.model("Exhibit", exhibitSchema);
