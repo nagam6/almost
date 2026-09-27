@@ -1,4 +1,5 @@
 import "./ExhibitCard.css";
+import { Link } from "react-router-dom";
 
 export default function ExhibitCard({ exhibit }) {
   return (
@@ -32,6 +33,15 @@ export default function ExhibitCard({ exhibit }) {
       <p className="exhibit-card__prompt">
         Can you spot where the thinking went wrong?
       </p>
+      
+      <Link
+  className="exhibit-card__link"
+  to={`/museum/exhibits/${exhibit.id}`}
+  aria-label={`Explore exhibit: ${exhibit.title}`}
+>
+  Explore mistake <span aria-hidden="true">↗</span>
+</Link>
+
     </article>
   );
 }
