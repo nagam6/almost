@@ -1,12 +1,65 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { getExhibit } from "../services/api";
 import NotFoundPage from "./NotFoundPage";
 import "./ExhibitPage.css";
+import "./ExhibitAttempt.css";
+import { useAuth } from "../components/AuthProvider";
+import { getMyAttempt, submitAttempt } from "../services/attemptsApi";
 
-function ExhibitChallenge({ exhibit }) {
+function ExhibitChallenge({ exhibit, user }) {
   const [selectedId, setSelectedId] = useState("");
   const [reasoning, setReasoning] = useState("");
+
+  const [attempt, setAttempt] = useState(null);
+  const [checking, setChecking] = useState(Boolean(user));
+  const [saving, setSaving] = useState(false);
+  const [loadError, setLoadError] = useState("");
+  const [submitError, setSubmitError] = useState("");
+  const [retryCount, setRetryCount] = useState(0);
+  const [expired, setExpired] = useState(false);
+  const submitting = useRef(false);
+
+  useEffect(() => {
+    if (!user) return;
+    const controller = new AbortController();
+    setChecking(true); setLoadError(""); setExpired(false);
+    getMyAttempt(exhibit.slug, controller.signal)
+      .then(({ attempt: saved }) => {
+        if (controller.signal.aborted) return;
+        setAttempt(saved);
+        if (saved) { setSelectedId(saved.selectedOptionId); setReasoning(saved.reasoning || ""); }
+      })
+      .catch((error) => {
+        if (controller.signal.aborted) return;
+        setLoadError(error.message);
+        if (error.status === 401) setExpired(true);
+      })
+      .finally(() => { if (!controller.signal.aborted) setChecking(false); });
+    return () => controller.abort();
+  }, [exhibit.slug, user?.id, retryCount]);
+
+  async function handleSubmit(event) {
+    event.preventDefault();
+    if (submitting.current || attempt || !selectedId || !user || checking || loadError) return;
+    submitting.current = true;
+    setSaving(true); setSubmitError("");
+    try {
+  const data = await submitAttempt(exhibit.slug, {
+  selectedOptionId: selectedId,
+  reasoning,
+  exhibitVersion: exhibit.version,
+});
+      setAttempt(data.attempt);
+      setSelectedId(data.attempt.selectedOptionId);
+      setReasoning(data.attempt.reasoning || "");
+    } catch (error) {
+      setSubmitError(error.message);
+      if (error.status === 401) setExpired(true);
+    } finally { submitting.current = false; setSaving(false); }
+  }
+  const locked = !user || user.role !== "student" || checking || Boolean(loadError) || saving || Boolean(attempt) || expired;
+  const loginLink = <Link to="/login" state={{ from: `/museum/exhibits/${exhibit.slug}` }}>Log in to answer</Link>;
 
   return (
     <div className="exhibit-page container">
@@ -61,7 +114,8 @@ function ExhibitChallenge({ exhibit }) {
         >
           <h2 id="challenge-title">Your turn to rethink</h2>
 
-          <fieldset className="exhibit-page__options">
+          <form onSubmit={handleSubmit}>
+          <fieldset className="exhibit-page__options" disabled={locked}>
             <legend>Where did the thinking go wrong?</legend>
 
             {exhibit.options.map((option) => (
@@ -102,12 +156,28 @@ function ExhibitChallenge({ exhibit }) {
             placeholder="Walk us through your thinking..."
             maxLength={1000}
             rows={4}
+            disabled={locked}
           />
 
-          <p className="exhibit-page__preview-note">
-            Preview mode — you can explore the choices.
-            Answers are not submitted or saved yet.
-          </p>
+          {!user && <p className="attempt-note">{loginLink} to save your answer and see the explanation.</p>}
+          {user && user.role !== "student" && <p className="attempt-note">Teacher accounts can browse. Learning attempts are for student accounts.</p>}
+          {checking && <p role="status">Checking your previous attempt…</p>}
+          {loadError && <div className="attempt-error" role="alert"><p>{loadError}</p>
+            {expired ? loginLink : <button type="button" className="attempt-button" onClick={() => setRetryCount((n) => n + 1)}>Try again</button>}
+          </div>}
+          {submitError && <div className="attempt-error" role="alert"><p>{submitError}</p>{expired && loginLink}</div>}
+          {user?.role === "student" && !attempt && <button type="submit" className="attempt-button" disabled={locked || !selectedId}>
+            {saving ? "Saving your thinking…" : "Check my thinking →"}
+          </button>}
+          </form>
+          {attempt && <div className={`attempt-result ${attempt.isCorrect ? "attempt-result--correct" : "attempt-result--rethink"}`} role="status" aria-live="polite">
+            <p className="attempt-result__label">FIRST ATTEMPT SAVED</p>
+            <h3>{attempt.isCorrect ? "You found the mistake." : "A useful moment to rethink."}</h3>
+            <p><strong>The correct diagnosis:</strong> {attempt.correctOptionText}</p>
+            <p>{attempt.explanation}</p>
+            <p className="attempt-note">Your first answer is saved. This result will still be here when you return.</p>
+            <Link to={`/museum/${exhibit.roomSlug}`}>Explore another exhibit →</Link>
+          </div>}
         </section>
       </div>
     </div>
@@ -115,6 +185,7 @@ function ExhibitChallenge({ exhibit }) {
 }
 
 function ExhibitLoader({ exhibitId }) {
+  const auth = useAuth();
   const [exhibit, setExhibit] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -189,7 +260,9 @@ function ExhibitLoader({ exhibitId }) {
     );
   }
 
-  return exhibit ? <ExhibitChallenge exhibit={exhibit} /> : null;
+  if (auth.loading) return <p className="container" role="status">Checking your session…</p>;
+  if (auth.error) return <div className="container"><p role="alert">{auth.error}</p><button type="button" onClick={auth.retry}>Retry session</button></div>;
+  return exhibit ? <ExhibitChallenge key={`${exhibit.slug}:${auth.user?.id || "guest"}`} exhibit={exhibit} user={auth.user} /> : null;
 }
 
 export default function ExhibitPage() {
