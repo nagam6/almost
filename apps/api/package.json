@@ -3,15 +3,20 @@
   "private": true,
   "version": "0.1.0",
   "type": "module",
-"scripts": {
-  "dev": "node --watch src/index.js",
-  "start": "node src/index.js",
-  "seed:rooms": "node src/scripts/seedRooms.js",
-  "seed:exhibits": "node src/scripts/seedExhibits.js"
-},
+  "scripts": {
+    "dev": "node --watch src/index.js",
+    "start": "node src/index.js",
+    "seed:rooms": "node src/scripts/seedRooms.js",
+    "seed:exhibits": "node src/scripts/seedExhibits.js"
+  },
   "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "cookie-parser": "^1.4.7",
     "dotenv": "^18.0.4",
     "express": "^4.21.0",
-    "mongoose": "^9.10.2"
+    "express-rate-limit": "^8.7.0",
+    "jsonwebtoken": "^9.0.3",
+    "mongoose": "^9.10.2",
+    "nodemailer": "^10.0.11"
   }
 }

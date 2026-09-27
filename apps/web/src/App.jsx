@@ -5,16 +5,24 @@ import MuseumPage from "./pages/MuseumPage";
 import NotFoundPage from "./pages/NotFoundPage";
 import ExhibitPage from "./pages/ExhibitPage";
 import MuseumRoomPage from "./pages/MuseumRoomPage";
+import { AuthProvider, ProtectedRoute } from "./components/AuthProvider";
+import AuthPage from "./pages/AuthPage";
+import ProfilePage from "./pages/ProfilePage";
 export default function App() {
   return (
-    <AppLayout>
+    <AuthProvider><AppLayout>
       <Routes>
+        <Route path="/login" element={<AuthPage key="login" mode="login" />} />
+        <Route path="/register" element={<AuthPage key="register" mode="register" />} />
+        <Route path="/forgot-password" element={<AuthPage key="forgot" mode="forgot-password" />} />
+        <Route path="/reset-password" element={<AuthPage key="reset" mode="reset-password" />} />
+        <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
         <Route path="/" element={<HomePage />} />
         <Route path="/museum" element={<MuseumPage />} />
         <Route path="*" element={<NotFoundPage />} />
         <Route path="/museum/:roomId"element={<MuseumRoomPage />} />
         <Route path="/museum/exhibits/:exhibitId"element={<ExhibitPage />} />
       </Routes>
-    </AppLayout>
+    </AppLayout></AuthProvider>
   );
 }
