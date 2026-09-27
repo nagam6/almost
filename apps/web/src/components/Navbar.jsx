@@ -1,21 +1,32 @@
+import { Link, NavLink } from "react-router-dom";
 import "./Navbar.css";
 
 export default function Navbar() {
+  function getLinkClass({ isActive }) {
+    return isActive
+      ? "navbar__link navbar__link--active"
+      : "navbar__link";
+  }
+
   return (
     <header className="site-header">
       <div className="container navbar">
-        <a className="navbar__brand" href="/" aria-label="Almost home">
+        <Link
+          className="navbar__brand"
+          to="/"
+          aria-label="Almost home"
+        >
           almost<span className="navbar__brand-dot">.</span>
-        </a>
+        </Link>
 
         <nav className="navbar__links" aria-label="Main navigation">
-          <a
-            className="navbar__link navbar__link--active"
-            href="/"
-            aria-current="page"
-          >
+          <NavLink to="/" end className={getLinkClass}>
+            Home
+          </NavLink>
+
+          <NavLink to="/museum" className={getLinkClass}>
             Museum
-          </a>
+          </NavLink>
         </nav>
       </div>
     </header>
