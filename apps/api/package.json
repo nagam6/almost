@@ -6,7 +6,8 @@
 "scripts": {
   "dev": "node --watch src/index.js",
   "start": "node src/index.js",
-  "seed:rooms": "node src/scripts/seedRooms.js"
+  "seed:rooms": "node src/scripts/seedRooms.js",
+  "seed:exhibits": "node src/scripts/seedExhibits.js"
 },
   "dependencies": {
     "dotenv": "^18.0.4",

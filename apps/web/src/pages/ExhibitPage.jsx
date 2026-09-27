@@ -1,11 +1,10 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import { museumRooms } from "../data/museumRooms";
-import { exhibitChallenges } from "../data/exhibitChallenges";
+import { getExhibit } from "../services/api";
 import NotFoundPage from "./NotFoundPage";
 import "./ExhibitPage.css";
 
-function ExhibitChallenge({ exhibit, challenge, room }) {
+function ExhibitChallenge({ exhibit }) {
   const [selectedId, setSelectedId] = useState("");
   const [reasoning, setReasoning] = useState("");
 
@@ -13,14 +12,15 @@ function ExhibitChallenge({ exhibit, challenge, room }) {
     <div className="exhibit-page container">
       <Link
         className="exhibit-page__back"
-        to={`/museum/${room.id}`}
+        to={`/museum/${exhibit.roomSlug}`}
       >
-        ← Back to {room.name}
+        ← Back to room
       </Link>
 
       <header className="exhibit-page__header">
         <p className="exhibit-page__eyebrow">
-          Exhibit {exhibit.number} · {exhibit.topic}
+          Exhibit {String(exhibit.number).padStart(3, "0")} ·{" "}
+          {exhibit.topic}
         </p>
 
         <h1>{exhibit.title}</h1>
@@ -37,7 +37,10 @@ function ExhibitChallenge({ exhibit, challenge, room }) {
         >
           <h2 id="question-title">The question</h2>
 
-          <p className="exhibit-page__question">
+          <p
+            className="exhibit-page__question"
+            style={{ whiteSpace: "pre-wrap" }}
+          >
             {exhibit.question}
           </p>
 
@@ -47,8 +50,8 @@ function ExhibitChallenge({ exhibit, challenge, room }) {
           </div>
 
           <p className="exhibit-page__hint">
-            This answer is intentionally incorrect.
-            Your challenge is to understand why.
+            This answer is intentionally incorrect. Your challenge
+            is to understand why.
           </p>
         </section>
 
@@ -61,7 +64,7 @@ function ExhibitChallenge({ exhibit, challenge, room }) {
           <fieldset className="exhibit-page__options">
             <legend>Where did the thinking go wrong?</legend>
 
-            {challenge.options.map((option) => (
+            {exhibit.options.map((option) => (
               <label
                 key={option.id}
                 className={`exhibit-page__option ${
@@ -72,7 +75,7 @@ function ExhibitChallenge({ exhibit, challenge, room }) {
               >
                 <input
                   type="radio"
-                  name={`answer-${exhibit.id}`}
+                  name={`answer-${exhibit.slug}`}
                   value={option.id}
                   checked={selectedId === option.id}
                   onChange={() => setSelectedId(option.id)}
@@ -111,29 +114,91 @@ function ExhibitChallenge({ exhibit, challenge, room }) {
   );
 }
 
-export default function ExhibitPage() {
-  const { exhibitId } = useParams();
+function ExhibitLoader({ exhibitId }) {
+  const [exhibit, setExhibit] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [notFound, setNotFound] = useState(false);
+  const [retryCount, setRetryCount] = useState(0);
 
-  const room = museumRooms.find((item) =>
-    item.exhibits.some((exhibit) => exhibit.id === exhibitId)
-  );
+  useEffect(() => {
+    const controller = new AbortController();
 
-  const exhibit = room?.exhibits.find(
-    (item) => item.id === exhibitId
-  );
+    async function loadExhibit() {
+      setLoading(true);
+      setError("");
+      setNotFound(false);
 
-  const challenge = exhibitChallenges[exhibitId];
+      try {
+        const data = await getExhibit(
+          exhibitId,
+          controller.signal
+        );
 
-  if (!room || !exhibit || !challenge) {
+        if (controller.signal.aborted) return;
+
+        setExhibit(data);
+      } catch (error) {
+        if (controller.signal.aborted) return;
+
+        if (error.status === 404) {
+          setNotFound(true);
+        } else {
+          setError(
+            "We couldn't load this exhibit. Please try again."
+          );
+        }
+      } finally {
+        if (!controller.signal.aborted) {
+          setLoading(false);
+        }
+      }
+    }
+
+    loadExhibit();
+
+    return () => controller.abort();
+  }, [exhibitId, retryCount]);
+
+  if (notFound) {
     return <NotFoundPage />;
   }
 
+  if (loading || error) {
+    return (
+      <div className="exhibit-page container">
+        <Link className="exhibit-page__back" to="/museum">
+          ← All rooms
+        </Link>
+
+        {loading ? (
+          <p role="status">Loading the exhibit…</p>
+        ) : (
+          <div>
+            <p role="alert">{error}</p>
+
+            <button
+              type="button"
+              onClick={() => setRetryCount((count) => count + 1)}
+            >
+              Try again
+            </button>
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  return exhibit ? <ExhibitChallenge exhibit={exhibit} /> : null;
+}
+
+export default function ExhibitPage() {
+  const { exhibitId } = useParams();
+
   return (
-    <ExhibitChallenge
-      key={exhibit.id}
-      exhibit={exhibit}
-      challenge={challenge}
-      room={room}
+    <ExhibitLoader
+      key={exhibitId}
+      exhibitId={exhibitId}
     />
   );
 }
