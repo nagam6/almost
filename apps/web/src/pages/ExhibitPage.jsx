@@ -173,6 +173,7 @@ function ExhibitChallenge({ exhibit, user }) {
           {attempt && <div className={`attempt-result ${attempt.isCorrect ? "attempt-result--correct" : "attempt-result--rethink"}`} role="status" aria-live="polite">
             <p className="attempt-result__label">FIRST ATTEMPT SAVED</p>
             <h3>{attempt.isCorrect ? "You found the mistake." : "A useful moment to rethink."}</h3>
+            {attempt.selectedOptionFeedback && <p className="attempt-result__choice-feedback"><strong>About your choice:</strong> {attempt.selectedOptionFeedback}</p>}
             <p><strong>The correct diagnosis:</strong> {attempt.correctOptionText}</p>
             <p>{attempt.explanation}</p>
             <p className="attempt-note">Your first answer is saved. This result will still be here when you return.</p>

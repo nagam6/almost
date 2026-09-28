@@ -15,6 +15,7 @@ const attemptSchema = new mongoose.Schema(
     correctOptionId: { type: String, required: true, immutable: true, select: false },
     correctOptionText: { type: String, required: true, immutable: true, select: false },
     explanation: { type: String, required: true, immutable: true, select: false },
+    selectedOptionFeedback: { type: String, default: "", immutable: true, select: false },
   },
   { timestamps: { createdAt: "submittedAt", updatedAt: false } }
 );

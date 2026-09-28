@@ -3,7 +3,7 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import { teacherRequest } from "../services/teacherApi";
 import "./Teacher.css";
 
-const blank = () => ({ roomSlug: "", number: 1, topic: "", title: "", question: "", incorrectAnswer: "", options: [{ id: "a", text: "" }, { id: "b", text: "" }, { id: "c", text: "" }], correctOptionId: "", explanation: "" });
+const blank = () => ({ roomSlug: "", number: 1, topic: "", title: "", question: "", incorrectAnswer: "", options: [{ id: "a", text: "", feedback: "" }, { id: "b", text: "", feedback: "" }, { id: "c", text: "", feedback: "" }], correctOptionId: "", explanation: "" });
 function payload(form) {
   return Object.fromEntries(Object.keys(blank()).map((key) => [key, form[key]]));
 }
@@ -108,13 +108,16 @@ function Editor({ slug }) {
         <label>Exhibit title<input required maxLength={160} value={form.title} onChange={(e) => change("title", e.target.value)} placeholder="e.g. The discount that fooled us" /></label>
         <label>The original question<textarea required rows={3} maxLength={2000} value={form.question} onChange={(e) => change("question", e.target.value)} /></label>
         <label>The intentionally incorrect solution<textarea required rows={3} maxLength={2000} value={form.incorrectAnswer} onChange={(e) => change("incorrectAnswer", e.target.value)} /></label>
-        <div><h3>Where did the thinking go wrong?</h3><p className="text-muted">Write 2–6 possible diagnoses. Mark exactly one as correct.</p></div>
+        <div><h3>Where did the thinking go wrong?</h3><p className="text-muted">Write 2–6 diagnoses and explain each choice. Mark exactly one as correct.</p></div>
         {form.options.map((option, index) => <div className="teacher-option" key={option.id}>
           <label className="teacher-correct"><input type="radio" name="correctOption" required checked={form.correctOptionId === option.id} onChange={() => change("correctOptionId", option.id)} />Correct {index + 1}</label>
-          <label>Choice {index + 1}<input required maxLength={500} value={option.text} onChange={(e) => change("options", form.options.map((item) => item.id === option.id ? { ...item, text: e.target.value } : item))} /></label>
+          <div className="teacher-option-fields">
+            <label>Choice {index + 1}<input required maxLength={500} value={option.text} onChange={(e) => change("options", form.options.map((item) => item.id === option.id ? { ...item, text: e.target.value } : item))} /></label>
+            <label>Feedback after answering<textarea required rows={2} maxLength={600} value={option.feedback || ""} onChange={(e) => change("options", form.options.map((item) => item.id === option.id ? { ...item, feedback: e.target.value } : item))} placeholder="Explain why this diagnosis fits or doesn't fit the mistake." /></label>
+          </div>
           {editable && <button type="button" disabled={form.options.length <= 2} aria-label={`Remove choice ${index + 1}`} onClick={() => { change("options", form.options.filter((item) => item.id !== option.id)); if (form.correctOptionId === option.id) change("correctOptionId", ""); }}>Remove</button>}
         </div>)}
-        {editable && <button className="teacher-button teacher-button--secondary" type="button" disabled={form.options.length >= 6} onClick={() => { const id = ["a", "b", "c", "d", "e", "f"].find((value) => !form.options.some((o) => o.id === value)); change("options", [...form.options, { id, text: "" }]); }}>+ Add choice</button>}
+        {editable && <button className="teacher-button teacher-button--secondary" type="button" disabled={form.options.length >= 6} onClick={() => { const id = ["a", "b", "c", "d", "e", "f"].find((value) => !form.options.some((o) => o.id === value)); change("options", [...form.options, { id, text: "", feedback: "" }]); }}>+ Add choice</button>}
         <label>The reveal: corrected solution and explanation<textarea required rows={5} maxLength={3000} value={form.explanation} onChange={(e) => change("explanation", e.target.value)} placeholder="Explain the misconception and walk through the correct solution. Learners see this after answering." /></label>
       </fieldset>
       <div className="teacher-actions">

@@ -16,3 +16,4 @@
 .attempt-result h3 { margin-block: .6rem 1rem; }
 .attempt-result p { line-height: 1.75; margin-bottom: .8rem; }
 .exhibit-page__reason:disabled { opacity: .8; }
+.attempt-result__choice-feedback { padding: .85rem 1rem; border-radius: var(--radius-sm); background: var(--color-primary-soft); white-space: pre-wrap; }
