@@ -20,7 +20,19 @@ const student = { _id: new mongoose.Types.ObjectId(), role: "student", sessionVe
 const users = [teacher, other, student];
 const records = new Map();
 let sequence = 0;
-const query = (value) => ({ select() { return this; }, lean: async () => value, then(resolve, reject) { return Promise.resolve(value).then(resolve, reject); } });
+const query = (initial) => {
+  let value = initial;
+  return { select(fields) {
+    if (value && fields.includes("options.id options.text")) {
+      const doc = value.toObject ? value.toObject() : value;
+      value = { slug: doc.slug, roomSlug: doc.roomSlug, version: doc.version,
+        number: doc.number, topic: doc.topic, title: doc.title, question: doc.question,
+        incorrectAnswer: doc.incorrectAnswer,
+        options: doc.options.map(({ id, text }) => ({ id, text })) };
+    }
+    return this;
+  }, lean: async () => value, then(resolve, reject) { return Promise.resolve(value).then(resolve, reject); } };
+};
 User.findById = (id) => query(users.find((u) => String(u._id) === id));
 Room.exists = async ({ slug }) => slug === "math";
 Exhibit.create = async (values) => {
@@ -34,6 +46,10 @@ Exhibit.findOneAndUpdate = (filter, update) => {
   if (doc) { doc.set(update.$set); doc.__v += update.$inc.__v; }
   return query(doc);
 };
+const attempts = [];
+Attempt.init = async () => Attempt;
+Attempt.findOne = (filter) => query(attempts.find((item) => Object.entries(filter).every(([key, value]) => String(item[key]) === String(value))));
+Attempt.create = async (values) => { const doc = new Attempt(values); await doc.validate(); attempts.push(doc); return doc; };
 Attempt.aggregate = async (pipeline) => {
   assert.ok(pipeline[0].$match.exhibit);
   assert.equal(pipeline[0].$match.exhibitVersion, 1);
@@ -53,13 +69,13 @@ async function request(path, { user = teacher, method = "GET", body, origin = pr
   const res = await fetch(base + path, { method, headers, ...(body ? { body: JSON.stringify(body) } : {}) });
   return { status: res.status, body: await res.json() };
 }
-const valid = { roomSlug: "math", number: 4, topic: "Discounts", title: "A second discount", question: "What happens after a second discount?", incorrectAnswer: "Add both percentages.", options: [{ id: "a", text: "Same base" }, { id: "b", text: "Different base" }], correctOptionId: "b", explanation: "Apply each discount to the current price, not the original price." };
+const valid = { roomSlug: "math", number: 4, topic: "Discounts", title: "A second discount", question: "What happens after a second discount?", incorrectAnswer: "Add both percentages.", options: [{ id: "a", text: "Same base", feedback: "Adding the percentages treats them as the same base." }, { id: "b", text: "Different base", feedback: "Good: the second discount applies to the reduced price." }], correctOptionId: "b", explanation: "Apply each discount to the current price, not the original price." };
 
 test("teacher flow, ownership, CSRF, validation, lifecycle and aggregate privacy", async () => {
   assert.equal((await request("/api/teacher/exhibits", { user: null })).status, 401);
   assert.equal((await request("/api/teacher/exhibits", { user: student })).status, 403);
   assert.equal((await request("/api/teacher/exhibits", { method: "POST", body: valid, origin: "https://other.example" })).status, 403);
-  for (const change of [{ owner: String(other._id) }, { status: "published" }, { roomSlug: "unknown" }, { correctOptionId: "z" }, { options: [{ id: "a", text: "x" }, { id: "a", text: "y" }] }]) {
+  for (const change of [{ options: valid.options.map(({ id, text }) => ({ id, text })) }, { owner: String(other._id) }, { status: "published" }, { roomSlug: "unknown" }, { correctOptionId: "z" }, { options: [{ id: "a", text: "x" }, { id: "a", text: "y" }] }]) {
     assert.equal((await request("/api/teacher/exhibits", { method: "POST", body: { ...valid, ...change } })).status, 400);
   }
   const created = await request("/api/teacher/exhibits", { method: "POST", body: valid });
@@ -73,6 +89,15 @@ test("teacher flow, ownership, CSRF, validation, lifecycle and aggregate privacy
   assert.equal((await request(path, { method: "PUT", body: { ...valid, revision: 0 } })).status, 200);
   assert.equal((await request(path + "/publish", { method: "POST", body: { revision: 0 } })).status, 409);
   assert.equal((await request(path + "/publish", { method: "POST", body: { revision: 1 } })).status, 200);
+  const publicExhibit = await request(`/api/exhibits/${doc.slug}`);
+  assert.equal(publicExhibit.status, 200);
+  assert.ok(!JSON.stringify(publicExhibit.body).includes("Adding the percentages"));
+  assert.ok(!JSON.stringify(publicExhibit.body).includes("correctOptionId"));
+  const submitted = await request(`/api/exhibits/${doc.slug}/attempt`, { user: student, method: "POST", body: { selectedOptionId: "a", exhibitVersion: 1 } });
+  assert.equal(submitted.status, 201);
+  assert.equal(submitted.body.attempt.selectedOptionFeedback, valid.options[0].feedback);
+  const recovered = await request(`/api/exhibits/${doc.slug}/attempt`, { user: student });
+  assert.equal(recovered.body.attempt.selectedOptionFeedback, valid.options[0].feedback);
   assert.equal((await request(path, { method: "PUT", body: { ...valid, revision: 2 } })).status, 409);
   assert.equal((await request(path + "/publish", { method: "POST", body: { revision: 2 } })).status, 409);
   const stats = await request(path + "/stats");

@@ -30,6 +30,7 @@
 .teacher-option { display: grid; grid-template-columns: auto 1fr auto; gap: 1rem; align-items: center; padding: 1rem; border-radius: 12px; background: var(--color-background); }
 .teacher-fields .teacher-correct { display: flex; align-items: center; font-size: .85rem; }
 .teacher-correct input { accent-color: var(--color-primary); }
+.teacher-option-fields { display: grid; gap: .75rem; min-width: 0; }
 .teacher-option button { border: 0; background: transparent; color: var(--color-error); }
 .teacher-actions { display: flex; gap: 1rem; flex-wrap: wrap; align-items: center; margin-block: 1.5rem .75rem; }
 .teacher-error, .teacher-success { padding: 1rem; border-radius: 12px; margin-block: 1rem; }

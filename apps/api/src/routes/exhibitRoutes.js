@@ -6,7 +6,7 @@ import { requireAuth } from "../middleware/auth.js";
 
 const router = Router();
 const run = (handler) => (req, res, next) => Promise.resolve(handler(req, res)).catch(next);
-const feedbackFields = "+correctOptionId +correctOptionText +explanation";
+const feedbackFields = "+correctOptionId +correctOptionText +explanation +selectedOptionFeedback";
 const submitLimit = rateLimit({
   windowMs: 60 * 1000, limit: 30, standardHeaders: "draft-7", legacyHeaders: false,
   message: { message: "Too many submissions. Please wait a minute." },
@@ -33,12 +33,13 @@ function resultOf(attempt) {
     correctOptionId: attempt.correctOptionId,
     correctOptionText: attempt.correctOptionText,
     explanation: attempt.explanation,
+    selectedOptionFeedback: attempt.selectedOptionFeedback || null,
   };
 }
 
 router.get("/:slug", run(async (req, res) => {
   const exhibit = await Exhibit.findOne({ slug: req.params.slug, status: "published" })
-    .select("slug roomSlug version number topic title question incorrectAnswer options -_id").lean();
+    .select("slug roomSlug version number topic title question incorrectAnswer options.id options.text -_id").lean();
   if (!exhibit) return res.status(404).json({ message: "Exhibit not found." });
   res.json({ exhibit });
 }));
@@ -74,6 +75,7 @@ router.post("/:slug/attempt", noStore, safeWrite, requireAuth, submitLimit, run(
     return res.status(400).json({ message: "Choose one of this exhibit's answer options." });
   }
   const correctOption = exhibit.options.find((option) => option.id === exhibit.correctOptionId);
+  const selectedOption = exhibit.options.find((option) => option.id === selectedOptionId);
   if (!correctOption || !exhibit.explanation) return res.status(409).json({ message: "This challenge is not ready for submissions." });
 
   // This unique index is also provisioned by setupAttemptIndexes.js.
@@ -88,6 +90,7 @@ router.post("/:slug/attempt", noStore, safeWrite, requireAuth, submitLimit, run(
       isCorrect: selectedOptionId === exhibit.correctOptionId,
       correctOptionId: correctOption.id, correctOptionText: correctOption.text,
       explanation: exhibit.explanation,
+      selectedOptionFeedback: selectedOption.feedback || "",
     });
     res.status(201).json({ attempt: resultOf(attempt), alreadySubmitted: false });
   } catch (error) {

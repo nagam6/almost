@@ -12,6 +12,8 @@ const optionSchema = new mongoose.Schema(
       required: true,
       trim: true,
     },
+    // Legacy published exhibits may not have this yet. New teacher drafts require it.
+    feedback: { type: String, trim: true, maxlength: 600, default: "" },
   },
   { _id: false }
 );

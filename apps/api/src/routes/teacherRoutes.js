@@ -40,10 +40,11 @@ function content(body) {
   result.number = body.number;
   if (!Array.isArray(body.options) || body.options.length < 2 || body.options.length > 6) throw fail(400, "Provide 2–6 answer choices.");
   result.options = body.options.map((option) => {
-    plainBody(option, ["id", "text"]);
+    plainBody(option, ["id", "text", "feedback"]);
     if (typeof option.id !== "string" || !/^[a-z0-9-]{1,20}$/.test(option.id) ||
-        typeof option.text !== "string" || !option.text.trim() || option.text.length > 500) throw fail(400, "Each option needs a valid ID and text (maximum 500 characters).");
-    return { id: option.id, text: option.text.trim() };
+        typeof option.text !== "string" || !option.text.trim() || option.text.length > 500 ||
+        typeof option.feedback !== "string" || !option.feedback.trim() || option.feedback.length > 600) throw fail(400, "Each option needs a valid ID, text (max 500) and feedback (max 600).");
+    return { id: option.id, text: option.text.trim(), feedback: option.feedback.trim() };
   });
   if (new Set(result.options.map((o) => o.id)).size !== result.options.length ||
       !result.options.some((o) => o.id === result.correctOptionId)) throw fail(400, "Choose exactly one valid correct option; option IDs must be unique.");
