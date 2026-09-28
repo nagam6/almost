@@ -15,8 +15,11 @@ export default function AppLayout({ children }) {
       </main>
 
       <footer className="site-footer">
-        <div className="container">
-          <p>Almost — a museum of mistakes.</p>
+        <div className="container site-footer__inner">
+          <p>
+            <strong>Almost.</strong> A museum of mistakes.
+          </p>
+          <small>© 2026 Almost. All rights reserved.</small>
         </div>
       </footer>
     </div>

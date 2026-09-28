@@ -9,22 +9,22 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 
-  /* Colors */
-  --color-background: #f8f7f4;
-  --color-surface: #ffffff;
-  --color-surface-muted: #efede8;
+  /* Museum palette: paper, ink, correction mark */
+  --color-background: #f3efe5;
+  --color-surface: #fffdf7;
+  --color-surface-muted: #e9e1d3;
 
-  --color-text: #242135;
-  --color-text-muted: #646070;
+  --color-text: #242b27;
+  --color-text-muted: #59625c;
 
-  --color-primary: #6850cf;
-  --color-primary-hover: #533caf;
-  --color-primary-soft: #eee9ff;
+  --color-primary: #a8492d;
+  --color-primary-hover: #86371f;
+  --color-primary-soft: #f5e5d9;
 
-  --color-border: #dedbe5;
+  --color-border: #cfc2ae;
   --color-success: #23734b;
-  --color-error: #b42338;
-  --color-focus: #6850cf;
+  --color-error: #a52f3d;
+  --color-focus: #a8492d;
 
   /* Spacing */
   --space-1: 0.25rem;
@@ -37,21 +37,20 @@
   --space-8: 4rem;
 
   /* Shape */
-  --radius-sm: 0.5rem;
-  --radius-md: 1rem;
-  --radius-lg: 1.5rem;
-  --radius-pill: 999px;
+  --radius-sm: 0.25rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-pill: 0.375rem;
 
   /* Layout */
   --container-width: 1200px;
   --page-gutter: clamp(1rem, 4vw, 2.5rem);
 
   /* Effects */
-  --shadow-card: 0 8px 30px rgb(36 33 53 / 6%);
+  --shadow-card: 6px 6px 0 rgb(36 43 39 / 9%);
   --transition-fast: 160ms ease;
 }
 
-/* Base reset */
 *,
 *::before,
 *::after {
@@ -81,6 +80,8 @@ h1,
 h2,
 h3,
 h4 {
+  font-family: Georgia, "Times New Roman", serif;
+  font-weight: 600;
   line-height: 1.2;
   text-wrap: balance;
 }
@@ -103,7 +104,6 @@ p {
   overflow-wrap: anywhere;
 }
 
-/* Media */
 img,
 video {
   display: block;
@@ -111,7 +111,6 @@ video {
   height: auto;
 }
 
-/* Links and controls */
 a {
   color: var(--color-primary);
   text-underline-offset: 0.2em;
@@ -142,7 +141,6 @@ textarea {
   resize: vertical;
 }
 
-/* Keyboard accessibility */
 :focus-visible {
   outline: 3px solid var(--color-focus);
   outline-offset: 4px;
@@ -153,7 +151,6 @@ textarea {
   background-color: var(--color-primary-soft);
 }
 
-/* Shared layout helpers */
 .container {
   width: 100%;
   max-width: var(--container-width);
@@ -177,7 +174,6 @@ textarea {
   border: 0;
 }
 
-/* Respect reduced-motion preferences */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
