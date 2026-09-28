@@ -14,6 +14,7 @@
 .attempt-result--correct { background: #edf8f1; border-color: #bcdcc8; }
 .attempt-result__label { font-size: .7rem; letter-spacing: .12em; font-weight: 800; }
 .attempt-result h3 { margin-block: .6rem 1rem; }
+.attempt-result .attempt-button { margin: .5rem 1.5rem 1rem 0; }
 .attempt-result p { line-height: 1.75; margin-bottom: .8rem; }
 .exhibit-page__reason:disabled { opacity: .8; }
 .attempt-result__choice-feedback { padding: .85rem 1rem; border-radius: var(--radius-sm); background: var(--color-primary-soft); white-space: pre-wrap; }
