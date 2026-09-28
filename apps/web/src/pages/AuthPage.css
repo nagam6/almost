@@ -26,6 +26,7 @@
 .auth-success { background: #edf8f1; color: #245b3b; }
 .auth-profile { padding-block: 3rem; max-width: 700px; }
 .auth-profile p { margin-block: 1rem; overflow-wrap: anywhere; }
+.profile-actions { display: flex; flex-wrap: wrap; gap: 1rem 1.5rem; margin-top: 1.5rem; }
 @media(max-width: 760px) { .auth-page { grid-template-columns: 1fr; gap: 1.5rem; } .auth-story h1 { font-size: 2.4rem; } .auth-art { display: none; } }
 
 .auth-password-field { display: grid; gap: .45rem; }
