@@ -14,8 +14,29 @@
 .site-footer {
   padding-block: var(--space-5);
   border-top: 1px solid var(--color-border);
+  background-color: var(--color-surface);
   color: var(--color-text-muted);
-  font-size: 0.875rem;
+}
+
+.site-footer__inner {
+  display: grid;
+  justify-items: center;
+  gap: 0.35rem;
+  text-align: center;
+}
+
+.site-footer p {
+  font-size: 0.9rem;
+}
+
+.site-footer strong {
+  color: var(--color-text);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.05rem;
+}
+
+.site-footer small {
+  font-size: 0.75rem;
 }
 
 .skip-link {

@@ -1,9 +1,13 @@
+/* apps/web/src/pages/ExhibitPage.css */
+
 .exhibit-page__back {
   display: inline-flex;
   align-items: center;
   min-height: 44px;
-  margin-bottom: var(--space-5);
-  font-weight: 600;
+  margin-bottom: var(--space-6);
+  color: var(--color-primary);
+  font-size: 0.9rem;
+  font-weight: 700;
   text-decoration: none;
 }
 
@@ -19,19 +23,21 @@
 .exhibit-page__eyebrow {
   margin-bottom: var(--space-4);
   color: var(--color-primary);
-  font-size: 0.8rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
+  font-size: 0.76rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
 }
 
 .exhibit-page__header h1 {
-  font-size: clamp(2rem, 5vw, 3.5rem);
+  font-size: clamp(2.8rem, 6vw, 4.8rem);
+  line-height: 1.07;
 }
 
 .exhibit-page__intro {
   margin-top: var(--space-4);
   color: var(--color-text-muted);
+  font-size: 1.1rem;
 }
 
 .exhibit-page__grid {
@@ -45,14 +51,21 @@
   min-width: 0;
   padding: clamp(1.25rem, 3vw, 2rem);
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
   background-color: var(--color-surface);
   box-shadow: var(--shadow-card);
 }
 
+.exhibit-panel:first-child {
+  border-top: 4px solid var(--color-text);
+}
+
+.exhibit-panel:last-child {
+  border-top: 4px solid var(--color-primary);
+}
+
 .exhibit-panel h2 {
   margin-bottom: var(--space-5);
-  font-size: 1.4rem;
+  font-size: 1.65rem;
 }
 
 .exhibit-page__question {
@@ -65,20 +78,23 @@
   margin-top: var(--space-6);
   padding: var(--space-5);
   border-inline-start: 3px solid var(--color-primary);
-  border-radius: var(--radius-sm);
   background-color: var(--color-primary-soft);
 }
 
 .exhibit-page__wrong-answer h3 {
   margin-bottom: var(--space-3);
   color: var(--color-primary);
-  font-size: 0.8rem;
+  font-family: "Segoe UI", Arial, sans-serif;
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
-  letter-spacing: 0.04em;
 }
 
 .exhibit-page__wrong-answer p {
   font-weight: 600;
+  line-height: 1.7;
+  white-space: pre-wrap;
 }
 
 .exhibit-page__hint {
@@ -97,7 +113,7 @@
 .exhibit-page__options legend {
   margin-bottom: var(--space-4);
   padding: 0;
-  font-weight: 600;
+  font-weight: 700;
 }
 
 .exhibit-page__option {
@@ -107,7 +123,7 @@
   margin-bottom: var(--space-3);
   padding: var(--space-4);
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
+  background-color: var(--color-surface);
   cursor: pointer;
   transition:
     border-color var(--transition-fast),
@@ -121,6 +137,7 @@
 .exhibit-page__option--selected {
   border-color: var(--color-primary);
   background-color: var(--color-primary-soft);
+  box-shadow: inset 4px 0 0 var(--color-primary);
 }
 
 .exhibit-page__option input {
@@ -129,11 +146,15 @@
   accent-color: var(--color-primary);
 }
 
+.exhibit-page__options:disabled .exhibit-page__option {
+  cursor: default;
+}
+
 .exhibit-page__reason-label {
   display: block;
   margin-top: var(--space-5);
   margin-bottom: var(--space-3);
-  font-weight: 600;
+  font-weight: 700;
 }
 
 .exhibit-page__reason {
@@ -141,7 +162,6 @@
   width: 100%;
   padding: var(--space-4);
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
   background-color: var(--color-background);
   color: var(--color-text);
 }
