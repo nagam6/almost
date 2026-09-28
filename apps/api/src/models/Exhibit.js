@@ -18,6 +18,8 @@ const optionSchema = new mongoose.Schema(
 
 const exhibitSchema = new mongoose.Schema(
   {
+    owner: { type: mongoose.Schema.Types.ObjectId, ref: "User", default: null, immutable: true },
+
     slug: {
       type: String,
       required: true,
@@ -115,13 +117,15 @@ const exhibitSchema = new mongoose.Schema(
 
     status: {
       type: String,
-      enum: ["draft", "pending", "published", "rejected"],
+      enum: ["draft", "pending", "published", "rejected", "archived"],
       default: "draft",
       index: true,
     },
   },
   { timestamps: true }
 );
+
+exhibitSchema.index({ owner: 1, updatedAt: -1 });
 
 // Supports the published exhibits query for each room.
 exhibitSchema.index({

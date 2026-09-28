@@ -41,6 +41,7 @@ export default function AuthPage({ mode }) {
   const location = useLocation();
   const [token] = useState(() => new URLSearchParams(location.hash.slice(1)).get("token") || "");
   const [name, setName] = useState("");
+  const [role, setRole] = useState("student");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
@@ -58,9 +59,8 @@ export default function AuthPage({ mode }) {
     setBusy(true);
     try {
       if (mode === "login" || isRegister) {
-        await auth.authenticate(mode, { name, email, password });
-        const from = location.state?.from;
-        navigate(typeof from === "string" && from.startsWith("/") && !from.startsWith("//") ? from : "/museum", { replace: true });
+        const user = await auth.authenticate(mode, isRegister ? { name, email, password, role } : { email, password });
+        navigate(user.role === "teacher" ? "/teacher" : "/museum", { replace: true });
       } else {
         const data = await authRequest(mode, isReset ? { token, password } : { email });
         setMessage(data.message); setPassword(""); setConfirm("");
@@ -72,12 +72,25 @@ export default function AuthPage({ mode }) {
   return <section className="auth-page container">
     <aside className="auth-story"><p className="auth-eyebrow">ALMOST · MUSEUM OF MISTAKES</p><h1>Progress starts<br />with a rethink<span>.</span></h1><p>Explore a mistake. Follow the thinking. Discover something new.</p><div className="auth-art" aria-hidden="true">almost<span>→</span>aha!</div></aside>
     <div className="auth-card"><p className="auth-eyebrow">YOUR NEXT CHAPTER</p><h2>{titles[mode]}</h2>
-      <p className="auth-muted">{mode === "login" ? "Log in to continue your learning journey." : isRegister ? "Create your student account. Curiosity is all you need." : isReset ? "Choose a new password for your account." : "Enter your email and we'll send a reset link if an account exists."}</p>
+      <p className="auth-muted">{mode === "login" ? "Log in to continue your learning journey." : isRegister ? "Choose how you want to explore or contribute to the museum." : isReset ? "Choose a new password for your account." : "Enter your email and we'll send a reset link if an account exists."}</p>
       {error && <p className="auth-error" role="alert">{error}</p>}
       {message && <p className="auth-success" role="status">{message}</p>}
       {isReset && !token && !message ? <p role="alert">Open the reset link from your email. <Link to="/forgot-password">Request a new link</Link>.</p> : !(isReset && message) && <form onSubmit={submit}>
         <fieldset disabled={busy} className="auth-fields">
-          {isRegister && <label>Full name<input autoComplete="name" value={name} onChange={(e) => setName(e.target.value)} required maxLength={80} /></label>}
+          {isRegister && <>
+            <label>Full name<input autoComplete="name" value={name} onChange={(e) => setName(e.target.value)} required maxLength={80} /></label>
+            <fieldset className="auth-role-options">
+              <legend>I am joining as</legend>
+              <label className={role === "student" ? "auth-role-option auth-role-option--selected" : "auth-role-option"}>
+                <input type="radio" name="role" value="student" checked={role === "student"} onChange={() => setRole("student")} />
+                <span><strong>Student</strong><small>Explore mistakes and learn from them.</small></span>
+              </label>
+              <label className={role === "teacher" ? "auth-role-option auth-role-option--selected" : "auth-role-option"}>
+                <input type="radio" name="role" value="teacher" checked={role === "teacher"} onChange={() => setRole("teacher")} />
+                <span><strong>Teacher</strong><small>Create exhibits and see anonymous results.</small></span>
+              </label>
+            </fieldset>
+          </>}
           {!isReset && <label>Email<input type="email" autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)} required maxLength={254} /></label>}
           {hasPassword && <PasswordField label="Password" autoComplete={mode === "login" ? "current-password" : "new-password"} value={password} onChange={(e) => setPassword(e.target.value)} required minLength={mode === "login" ? 1 : 12} maxLength={72} aria-describedby={mode === "login" ? undefined : "password-help"} />}
           {(isRegister || isReset) && <><small id="password-help">At least 12 characters; at most 72 UTF-8 bytes.</small><PasswordField label="Confirm password" autoComplete="new-password" value={confirm} onChange={(e) => setConfirm(e.target.value)} required maxLength={72} /></>}

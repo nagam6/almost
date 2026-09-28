@@ -1,4 +1,5 @@
 import express from "express";
+import teacherRoutes from "./routes/teacherRoutes.js";
 import cookieParser from "cookie-parser";
 import authRoutes from "./routes/authRoutes.js";
 import User from "./models/User.js";
@@ -31,6 +32,7 @@ app.use("/api/auth", authRoutes);
 
 app.use("/api/rooms", roomsRouter);
 app.use("/api/exhibits", exhibitRoutes);
+app.use("/api/teacher", teacherRoutes);
 
 app.get("/api/health", (_request, response) => {
   const isConnected = mongoose.connection.readyState === 1;

@@ -32,11 +32,13 @@ router.post("/register", limit, run(async (req, res) => {
   const email = normalizeEmail(req.body?.email);
   const name = typeof req.body?.name === "string" ? req.body.name.trim() : "";
   const password = req.body?.password;
+  const role = req.body?.role;
+  if (role !== "student" && role !== "teacher") return res.status(400).json({ message: "Choose Student or Teacher." });
   if (!name || name.length > 80 || !validEmail(email)) return res.status(400).json({ message: "Enter a name (up to 80 characters) and a valid email." });
   if (!validPassword(password)) return res.status(400).json({ message: passwordMessage });
   const passwordHash = await bcrypt.hash(password, 12);
   let user;
-  try { user = await User.create({ name, email, passwordHash, role: "student" }); }
+  try { user = await User.create({ name, email, passwordHash, role }); }
   catch (error) {
     if (error.code === 11000) return res.status(409).json({ message: "Unable to register with this email. Try logging in or resetting your password." });
     throw error;
