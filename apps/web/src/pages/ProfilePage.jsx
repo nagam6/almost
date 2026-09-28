@@ -1,7 +1,25 @@
-import { useAuth } from "../components/AuthProvider";
 import { Link } from "react-router-dom";
+import { useAuth } from "../components/AuthProvider";
 import "./AuthPage.css";
+
 export default function ProfilePage() {
   const { user } = useAuth();
-  return <section className="container auth-profile"><div className="auth-card"><p className="auth-eyebrow">YOUR PROFILE</p><h1>Hello, {user.name}.</h1><p>{user.email}</p><p>Role: {user.role}</p><Link to="/museum">Explore the museum →</Link></div></section>;
+  const isTeacher = user.role === "teacher";
+
+  return (
+    <section className="container auth-profile">
+      <div className="auth-card">
+        <p className="auth-eyebrow">YOUR PROFILE</p>
+        <h1>Hello, {user.name}.</h1>
+        <p><strong>Email:</strong> {user.email}</p>
+        <p><strong>Role:</strong> {isTeacher ? "Teacher" : "Student"}</p>
+        <nav className="profile-actions" aria-label="Profile actions">
+          <Link to={isTeacher ? "/teacher" : "/museum"}>
+            {isTeacher ? "Open Teacher Studio →" : "Explore the museum →"}
+          </Link>
+          <Link to="/forgot-password">Reset password by email</Link>
+        </nav>
+      </div>
+    </section>
+  );
 }
