@@ -1,3 +1,5 @@
+import TeacherDashboardPage, { TeacherOnly } from "./pages/TeacherDashboardPage";
+import TeacherExhibitPage from "./pages/TeacherExhibitPage";
 import { Route, Routes } from "react-router-dom";
 import AppLayout from "./components/AppLayout";
 import HomePage from "./pages/HomePage";
@@ -12,6 +14,9 @@ export default function App() {
   return (
     <AuthProvider><AppLayout>
       <Routes>
+        <Route path="/teacher" element={<ProtectedRoute><TeacherOnly><TeacherDashboardPage /></TeacherOnly></ProtectedRoute>} />
+        <Route path="/teacher/new" element={<ProtectedRoute><TeacherOnly><TeacherExhibitPage /></TeacherOnly></ProtectedRoute>} />
+        <Route path="/teacher/exhibits/:slug" element={<ProtectedRoute><TeacherOnly><TeacherExhibitPage /></TeacherOnly></ProtectedRoute>} />
         <Route path="/login" element={<AuthPage key="login" mode="login" />} />
         <Route path="/register" element={<AuthPage key="register" mode="register" />} />
         <Route path="/forgot-password" element={<AuthPage key="forgot" mode="forgot-password" />} />

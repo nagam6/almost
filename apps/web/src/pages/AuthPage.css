@@ -49,3 +49,11 @@
 .auth-password-toggle:hover { color: #533caf; background: #eee9ff; }
 .auth-password-toggle:focus-visible { outline: 3px solid #c8bbff; outline-offset: 1px; }
 .auth-password-toggle:disabled { cursor: wait; opacity: .6; }
+
+.auth-fields .auth-role-options { margin: 0; padding: 0; border: 0; display: grid; gap: .65rem; }
+.auth-role-options legend { font-size: .9rem; font-weight: 600; margin-bottom: .6rem; }
+.auth-fields .auth-role-option { display: flex; align-items: center; gap: .8rem; padding: .85rem 1rem; border: 1px solid var(--color-border); border-radius: .75rem; background: var(--color-surface); cursor: pointer; }
+.auth-fields .auth-role-option--selected { border-color: var(--color-primary); background: var(--color-primary-soft); }
+.auth-fields .auth-role-option input { width: auto; min-height: auto; margin: 0; accent-color: var(--color-primary); }
+.auth-role-option span { display: grid; gap: .1rem; }
+.auth-role-option small { font-weight: 400; }
