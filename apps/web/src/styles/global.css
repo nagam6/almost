@@ -58,15 +58,28 @@
 }
 
 body {
-  margin: 0;
+   margin: 0;
   min-width: 320px;
   line-height: 1.6;
+
+  background-image:
+    linear-gradient(
+      rgb(248 247 244 / 50%),
+      rgb(248 247 244 / 50%)
+    ),
+    url("../../../../docs/images/museum-background.jpg");
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
 }
 
 #root {
   min-height: 100vh;
   min-height: 100dvh;
+
 }
+
+
 
 h1,
 h2,

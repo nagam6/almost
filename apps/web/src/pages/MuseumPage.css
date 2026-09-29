@@ -214,3 +214,70 @@
     animation: none;
   }
 }
+
+/* Equal cards, with the frame around all content */
+.museum-rooms {
+  align-items: stretch;
+  grid-auto-rows: 1fr;
+}
+
+.museum-room {
+  position: relative;
+  isolation: isolate;
+  aspect-ratio: 3 / 4;
+  min-height: 530px;
+  padding: clamp(3.5rem, 6vw, 4.5rem)
+           clamp(3rem, 5vw, 4rem);
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.museum-room--math,
+.museum-room--javascript {
+  background: transparent;
+}
+
+.museum-room--javascript {
+  margin-top: 0;
+}
+
+/* Paper visible only inside the frame */
+.museum-room::before {
+  content: "";
+  position: absolute;
+  inset: 7% 8.5%;
+  z-index: 0;
+  background: var(--color-surface);
+  pointer-events: none;
+}
+
+/* The transparent image wraps the whole card */
+.museum-room::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  background: url("../../../../docs/images/frame.png")
+    center / 95% 95% no-repeat;
+  pointer-events: none;
+  filter: drop-shadow(8px 10px 5px rgb(36 43 39 / 18%));
+}
+
+.museum-room > * {
+  position: relative;
+  z-index: 1;
+}
+
+.museum-room:hover,
+.museum-room:focus-visible {
+  box-shadow: none;
+}
+
+@media (max-width: 700px) {
+  .museum-room {
+    aspect-ratio: auto;
+    min-height: 500px;
+    padding: 3.5rem 3rem;
+  }
+}
