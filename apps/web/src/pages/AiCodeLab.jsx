@@ -82,14 +82,13 @@ export default function AiCodeLab() {
       // النتيجه من هون
 
       setResult(feedback);
-<<<<<<< HEAD
+ 
       toast[feedback.correct ? "success" : "info"](feedback.correct ? "You caught the AI's mistake." : "Almost. Take another look at the explanation.");
-=======
+
       if (feedback.correct) {
         playCorrectSound();
       }
 
->>>>>>> d7be2ef (git commit -m "feat: add sounds for answer feedback")
     } catch (caught) {
       setError(caught.message);
       toast.error(caught.message);
