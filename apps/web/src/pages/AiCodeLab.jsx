@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import { toast } from "react-toastify";
 import { checkAiChallenge, getAiChallenge } from "../services/aiApi";
 import "./MuseumRoomPage.css";
 
@@ -28,6 +29,7 @@ export default function AiCodeLab() {
       setChallenge(nextChallenge);
     } catch (caught) {
       setError(caught.message);
+      toast.error(caught.message);
       setLoginRequired(caught.status === 401);
     } finally {
       setLoading(false);
@@ -52,8 +54,10 @@ export default function AiCodeLab() {
       });
 
       setResult(feedback);
+      toast[feedback.correct ? "success" : "info"](feedback.correct ? "You caught the AI's mistake." : "Almost. Take another look at the explanation.");
     } catch (caught) {
       setError(caught.message);
+      toast.error(caught.message);
       setLoginRequired(caught.status === 401);
     } finally {
       setLoading(false);

@@ -1,5 +1,6 @@
 import { useId, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 import { useAuth } from "../components/AuthProvider";
 import { authRequest } from "../services/authApi";
 import "./AuthPage.css";
@@ -46,7 +47,6 @@ export default function AuthPage({ mode }) {
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
   const [busy, setBusy] = useState(false);
-  const [error, setError] = useState("");
   const [message, setMessage] = useState("");
   const isReset = mode === "reset-password";
   const isRegister = mode === "register";
@@ -54,26 +54,27 @@ export default function AuthPage({ mode }) {
   async function submit(event) {
     event.preventDefault();
     if (busy) return;
-    setError(""); setMessage("");
-    if ((isRegister || isReset) && password !== confirm) { setError("Passwords do not match."); return; }
+    setMessage("");
+    if ((isRegister || isReset) && password !== confirm) { toast.error("Passwords do not match."); return; }
     setBusy(true);
     try {
       if (mode === "login" || isRegister) {
         const user = await auth.authenticate(mode, isRegister ? { name, email, password, role } : { email, password });
+        toast.success(isRegister ? "Your account is ready." : "Welcome back!");
         navigate(user.role === "teacher" ? "/teacher" : "/museum", { replace: true });
       } else {
         const data = await authRequest(mode, isReset ? { token, password } : { email });
         setMessage(data.message); setPassword(""); setConfirm("");
+        toast.success(data.message);
         if (isReset) navigate("/reset-password", { replace: true });
       }
-    } catch (err) { setError(err.message); }
+    } catch (err) { toast.error(err.message); }
     finally { setBusy(false); }
   }
   return <section className="auth-page container">
     <aside className="auth-story"><p className="auth-eyebrow">ALMOST · MUSEUM OF MISTAKES</p><h1>Progress starts<br />with a rethink<span>.</span></h1><p>Explore a mistake. Follow the thinking. Discover something new.</p><div className="auth-art" aria-hidden="true">almost<span>→</span>aha!</div></aside>
     <div className="auth-card"><p className="auth-eyebrow">YOUR NEXT CHAPTER</p><h2>{titles[mode]}</h2>
       <p className="auth-muted">{mode === "login" ? "Log in to continue your learning journey." : isRegister ? "Choose how you want to explore or contribute to the museum." : isReset ? "Choose a new password for your account." : "Enter your email and we'll send a reset link if an account exists."}</p>
-      {error && <p className="auth-error" role="alert">{error}</p>}
       {message && <p className="auth-success" role="status">{message}</p>}
       {isReset && !token && !message ? <p role="alert">Open the reset link from your email. <Link to="/forgot-password">Request a new link</Link>.</p> : !(isReset && message) && <form onSubmit={submit}>
         <fieldset disabled={busy} className="auth-fields">

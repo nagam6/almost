@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
+import { toast } from "react-toastify";
 import ExhibitCard from "../components/ExhibitCard";
 import { getRoomExhibits } from "../services/api";
 import AiCodeLab from "./AiCodeLab";
@@ -45,6 +46,7 @@ function RoomContent({ roomId }) {
         if (caught.status === 404) {
           setNotFound(true);
         } else {
+          toast.error("We couldn't load this room. Please try again.", { toastId: `room-load-${roomId}` });
           setError(
             "We couldn't load this room. Please try again."
           );
