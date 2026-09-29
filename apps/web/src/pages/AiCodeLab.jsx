@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { toast } from "react-toastify";
 import { checkAiChallenge, getAiChallenge } from "../services/aiApi";
 import "./MuseumRoomPage.css";
+import { playCorrect, playWrong } from "../services/sounds";
 
 export default function AiCodeLab() {
   const [challenge, setChallenge] = useState(null);
@@ -62,6 +63,7 @@ export default function AiCodeLab() {
   oscillator.stop(audioContext.currentTime + 0.4);
 }
 
+
   async function checkAnswer(event) {
     event.preventDefault();
 
@@ -82,6 +84,13 @@ export default function AiCodeLab() {
       // النتيجه من هون
 
       setResult(feedback);
+
+      if (feedback.correct) {
+        playCorrect();
+      } else {
+        playWrong();
+      }
+
  
       toast[feedback.correct ? "success" : "info"](feedback.correct ? "You caught the AI's mistake." : "Almost. Take another look at the explanation.");
 
