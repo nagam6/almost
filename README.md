@@ -4,7 +4,7 @@
 
 **All Most** is an interactive Museum of Mistakes built around one idea: a wrong answer can be the start of real understanding. Students explore an intentionally incorrect solution, find where the thinking went wrong, and reveal the explanation. Teachers turn common misconceptions into exhibits and see anonymous patterns in student answers.
 
-![All Most home page](docs/images/homepage.png)
+![Almost home page](docs/images/homepage.png)
 
 > **Demo theme:** Imagine education in the future. What if mistakes became exhibits we could explore and repair together?
 
