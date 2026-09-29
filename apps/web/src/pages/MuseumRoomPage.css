@@ -1,71 +1,256 @@
-/* apps/web/src/pages/MuseumRoomPage.css */
-
-.museum-room-page__back {
-  display: inline-flex;
-  align-items: center;
-  min-height: 44px;
-  margin-bottom: var(--space-6);
-  color: var(--color-primary);
-  font-size: 0.9rem;
-  font-weight: 700;
-  text-decoration: none;
-}
-
-.museum-room-page__back:hover {
-  text-decoration: underline;
-}
-
-.museum-room-page__header {
-  margin-bottom: var(--space-7);
-  padding-bottom: var(--space-7);
-  border-bottom: 1px solid var(--color-border);
-}
-
-.museum-room-page__eyebrow {
-  display: inline-block;
-  margin-bottom: var(--space-4);
-  padding: 0.35rem 0.6rem;
-  border: 1px solid var(--color-primary);
-  color: var(--color-primary);
-  font-size: 0.72rem;
-  font-weight: 800;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-}
-
-.museum-room-page__header h1 {
-  font-size: clamp(3rem, 7vw, 5.5rem);
-  line-height: 1.05;
-}
-
-.museum-room-page__description {
-  max-width: 680px;
-  margin-top: var(--space-5);
-  color: var(--color-text-muted);
-  font-size: clamp(1rem, 2vw, 1.15rem);
-  line-height: 1.7;
-}
-
-.museum-room-page__grid {
+.museum-room-page__paths {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  align-items: stretch;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: var(--space-5);
 }
 
-@media (max-width: 1000px) {
-  .museum-room-page__grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
+.museum-path {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-4);
+  min-width: 0;
+  padding: clamp(1.5rem, 4vw, 2.5rem);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  color: var(--color-text);
+  text-align: left;
+  box-shadow: var(--shadow-card);
+  transition: transform var(--transition-fast), border-color var(--transition-fast);
 }
 
-@media (max-width: 650px) {
-  .museum-room-page__header {
-    margin-bottom: var(--space-6);
-    padding-bottom: var(--space-6);
-  }
+.museum-path:hover {
+  transform: translateY(-5px);
+  border-color: var(--color-primary);
+}
 
-  .museum-room-page__grid {
+.museum-path--ai {
+  background: var(--color-primary-soft);
+}
+
+.museum-path__icon {
+  font-size: 2rem;
+  color: var(--color-primary);
+}
+
+.museum-path__label,
+.ai-lab__tag {
+  color: var(--color-primary);
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+}
+
+.museum-path strong {
+  font-size: clamp(1.6rem, 3vw, 2.3rem);
+  line-height: 1.2;
+}
+
+.museum-path__enter {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  margin-top: auto;
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--color-border);
+  color: var(--color-primary);
+  font-weight: 700;
+}
+
+.museum-room-page__change-path,
+.ai-lab__next {
+  margin-bottom: var(--space-5);
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  color: var(--color-primary);
+  font-weight: 700;
+}
+
+.ai-lab {
+  padding-bottom: var(--space-8);
+}
+
+.ai-lab__heading {
+  max-width: 720px;
+  margin-bottom: var(--space-6);
+}
+
+.ai-lab__heading p:last-child {
+  margin-top: var(--space-3);
+  color: var(--color-text-muted);
+}
+
+.ai-lab__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: start;
+  gap: var(--space-5);
+}
+
+.ai-lab__panel {
+  min-width: 0;
+  padding: clamp(1.25rem, 3vw, 2rem);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+}
+
+.ai-lab__panel h3 {
+  margin: var(--space-3) 0;
+}
+
+.ai-lab__panel > p {
+  color: var(--color-text-muted);
+}
+
+.ai-lab__code {
+  overflow-x: auto;
+  margin-top: var(--space-5);
+  padding: var(--space-5);
+  border-radius: var(--radius-md);
+  background: #242135;
+  color: #f7f4ff;
+  font-size: 0.95rem;
+  line-height: 1.7;
+}
+
+.ai-lab__note {
+  margin-top: var(--space-4);
+  font-size: 0.85rem;
+}
+
+.ai-lab__modes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin: var(--space-5) 0;
+}
+
+.ai-lab__modes button {
+  min-height: 44px;
+  padding: var(--space-2) var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-pill);
+  background: var(--color-surface);
+  color: var(--color-text);
+}
+
+.ai-lab__modes button.is-active {
+  border-color: var(--color-primary);
+  background: var(--color-primary-soft);
+  color: var(--color-primary);
+  font-weight: 700;
+}
+
+.ai-lab__options {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.ai-lab__options legend {
+  margin-bottom: var(--space-3);
+  font-weight: 700;
+}
+
+.ai-lab__option {
+  display: flex;
+  gap: var(--space-3);
+  margin-bottom: var(--space-3);
+  padding: var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+}
+
+.ai-lab__option input {
+  accent-color: var(--color-primary);
+}
+
+.ai-lab__edit {
+  display: grid;
+  gap: var(--space-3);
+  font-weight: 700;
+}
+
+.ai-lab__edit code {
+  overflow-wrap: anywhere;
+}
+
+.ai-lab__edit input {
+  width: 100%;
+  min-height: 48px;
+  padding: var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  font-family: monospace;
+}
+
+.ai-lab__edit small {
+  color: var(--color-text-muted);
+  font-weight: 400;
+}
+
+.ai-lab__check {
+  min-height: 48px;
+  margin-top: var(--space-5);
+  padding: var(--space-3) var(--space-5);
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: var(--color-primary);
+  color: white;
+  font-weight: 700;
+}
+
+.ai-lab__check:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.ai-lab__result {
+  margin-top: var(--space-5);
+  padding: var(--space-5);
+  border-radius: var(--radius-md);
+  background: var(--color-primary-soft);
+}
+
+.ai-lab__result--correct {
+  background: #e9f6ee;
+}
+
+.ai-lab__result p {
+  margin-top: var(--space-3);
+}
+
+.ai-lab__result .ai-lab__code {
+  margin-top: var(--space-3);
+}
+
+.ai-lab__next {
+  margin-top: var(--space-5);
+}
+
+@media (max-width: 750px) {
+  .museum-room-page__paths,
+  .ai-lab__grid {
     grid-template-columns: 1fr;
   }
+}
+button.museum-room-page__back {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--color-primary);
+  font: inherit;
+  cursor: pointer;
+}
+
+.museum-room-page__paths {
+  margin-top: 2.5rem;
+}
+.museum-room-page__header {
+  margin-bottom: 2.5rem;
 }
