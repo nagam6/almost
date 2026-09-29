@@ -36,6 +36,32 @@ export default function AiCodeLab() {
     }
   }
 
+// اضافه-الصوت
+
+  function playCorrectSound() {
+  const audioContext = new (
+    window.AudioContext || window.webkitAudioContext
+  )();
+
+  const oscillator = audioContext.createOscillator();
+  const gain = audioContext.createGain();
+
+  oscillator.connect(gain);
+  gain.connect(audioContext.destination);
+
+  oscillator.type = "sine";
+  oscillator.frequency.value = 800;
+
+  gain.gain.setValueAtTime(0.3, audioContext.currentTime);
+  gain.gain.exponentialRampToValueAtTime(
+    0.01,
+    audioContext.currentTime + 0.4
+  );
+
+  oscillator.start();
+  oscillator.stop(audioContext.currentTime + 0.4);
+}
+
   async function checkAnswer(event) {
     event.preventDefault();
 
@@ -53,8 +79,17 @@ export default function AiCodeLab() {
           : { correctedLine: editedLine }),
       });
 
+      // النتيجه من هون
+
       setResult(feedback);
+<<<<<<< HEAD
       toast[feedback.correct ? "success" : "info"](feedback.correct ? "You caught the AI's mistake." : "Almost. Take another look at the explanation.");
+=======
+      if (feedback.correct) {
+        playCorrectSound();
+      }
+
+>>>>>>> d7be2ef (git commit -m "feat: add sounds for answer feedback")
     } catch (caught) {
       setError(caught.message);
       toast.error(caught.message);
