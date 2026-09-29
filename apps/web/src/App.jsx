@@ -25,8 +25,8 @@ export default function App() {
         <Route path="/" element={<HomePage />} />
         <Route path="/museum" element={<MuseumPage />} />
         <Route path="*" element={<NotFoundPage />} />
-        <Route path="/museum/:roomId"element={<MuseumRoomPage />} />
-        <Route path="/museum/exhibits/:exhibitId"element={<ExhibitPage />} />
+        <Route path="/museum/:roomId" element={<MuseumRoomPage />} />
+        <Route path="/museum/exhibits/:exhibitId" element={<ExhibitPage />} />
       </Routes>
     </AppLayout></AuthProvider>
   );

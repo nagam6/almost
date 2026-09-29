@@ -1,4 +1,4 @@
-import wrongAnswerUrl from "../../../../docs/sounds/wrong-answer.mp3?url";
+import wrongAnswerUrl from "../../../../docs/sounds/wrong-answer.mp3";
 let audioCtx = null;
 
 function getContext() {
@@ -31,8 +31,7 @@ function playTone(frequency, start, duration, type = "sine", volume = 0.15) {
 }
 
 export function playCorrect() {
-  const AudioContextClass =
-    window.AudioContext || window.webkitAudioContext;
+  const AudioContextClass = window.AudioContext || window.webkitAudioContext;
 
   if (!AudioContextClass) return;
 
@@ -47,10 +46,7 @@ export function playCorrect() {
   oscillator.frequency.value = 800;
 
   gain.gain.setValueAtTime(0.3, audioContext.currentTime);
-  gain.gain.exponentialRampToValueAtTime(
-    0.01,
-    audioContext.currentTime + 0.4
-  );
+  gain.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.4);
 
   oscillator.start();
   oscillator.stop(audioContext.currentTime + 0.4);
@@ -60,14 +56,10 @@ export function playCorrect() {
   };
 }
 
-
 export function playRethink() {
   playTone(330, 0, 0.2, "triangle");
   playTone(262, 0.2, 0.35, "triangle");
 }
-
-
-// AudioContext
 
 let wrongAnswerAudio;
 

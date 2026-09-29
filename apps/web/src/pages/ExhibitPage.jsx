@@ -27,12 +27,17 @@ function ExhibitChallenge({ exhibit, user }) {
   useEffect(() => {
     if (!user) return;
     const controller = new AbortController();
-    setChecking(true); setLoadError(""); setExpired(false);
+    setChecking(true);
+    setLoadError("");
+    setExpired(false);
     getMyAttempt(exhibit.slug, controller.signal)
       .then(({ attempt: saved }) => {
         if (controller.signal.aborted) return;
         setAttempt(saved);
-        if (saved) { setSelectedId(saved.selectedOptionId); setReasoning(saved.reasoning || ""); }
+        if (saved) {
+          setSelectedId(saved.selectedOptionId);
+          setReasoning(saved.reasoning || "");
+        }
       })
       .catch((error) => {
         if (controller.signal.aborted) return;
@@ -40,94 +45,106 @@ function ExhibitChallenge({ exhibit, user }) {
         toast.error(error.message, { toastId: `attempt-load-${exhibit.slug}` });
         if (error.status === 401) setExpired(true);
       })
-      .finally(() => { if (!controller.signal.aborted) setChecking(false); });
+      .finally(() => {
+        if (!controller.signal.aborted) setChecking(false);
+      });
     return () => controller.abort();
   }, [exhibit.slug, user?.id, retryCount]);
 
-async function handleSubmit(event) {
-  event.preventDefault();
+  async function handleSubmit(event) {
+    event.preventDefault();
 
-  if (
-    submitting.current ||
-    !selectedId ||
-    !user ||
-    user.role !== "student" ||
-    checking ||
-    loadError ||
-    expired
-  ) return;
+    if (
+      submitting.current ||
+      !selectedId ||
+      !user ||
+      user.role !== "student" ||
+      checking ||
+      loadError ||
+      expired
+    )
+      return;
 
-  if (attempt) {
-    if (!practiceMode) return;
+    if (attempt) {
+      if (!practiceMode) return;
 
-    const isCorrect = selectedId === attempt.correctOptionId;
+      const isCorrect = selectedId === attempt.correctOptionId;
 
-    setPracticeResult({
-      selectedOptionId: selectedId,
-      isCorrect,
-    });
-    setPracticeMode(false);
+      setPracticeResult({
+        selectedOptionId: selectedId,
+        isCorrect,
+      });
+      setPracticeMode(false);
 
-    if (isCorrect) playCorrect();
-    else playWrong();
-
-    toast.info("Practice round complete. Your first answer stays saved.");
-    return;
-  }
-
-  submitting.current = true;
-  setSaving(true);
-  setSubmitError("");
-
-  try {
-    const data = await submitAttempt(exhibit.slug, {
-      selectedOptionId: selectedId,
-      reasoning,
-      exhibitVersion: exhibit.version,
-    });
-
-    setAttempt(data.attempt);
-    setSelectedId(data.attempt.selectedOptionId);
-    setReasoning(data.attempt.reasoning || "");
-
-    if (!data.alreadySubmitted) {
-      if (data.attempt.isCorrect) playCorrect();
+      if (isCorrect) playCorrect();
       else playWrong();
+
+      toast.info("Practice round complete. Your first answer stays saved.");
+      return;
     }
 
-    toast.success("Your first answer is saved.");
-  } catch (error) {
-    setSubmitError(error.message);
-    toast.error(error.message);
-    if (error.status === 401) setExpired(true);
-  } finally {
-    submitting.current = false;
-    setSaving(false);
+    submitting.current = true;
+    setSaving(true);
+    setSubmitError("");
+
+    try {
+      const data = await submitAttempt(exhibit.slug, {
+        selectedOptionId: selectedId,
+        reasoning,
+        exhibitVersion: exhibit.version,
+      });
+
+      setAttempt(data.attempt);
+      setSelectedId(data.attempt.selectedOptionId);
+      setReasoning(data.attempt.reasoning || "");
+
+      if (!data.alreadySubmitted) {
+        if (data.attempt.isCorrect) playCorrect();
+        else playWrong();
+      }
+
+      toast.success("Your first answer is saved.");
+    } catch (error) {
+      setSubmitError(error.message);
+      toast.error(error.message);
+      if (error.status === 401) setExpired(true);
+    } finally {
+      submitting.current = false;
+      setSaving(false);
+    }
   }
-}
   function handlePractice() {
     setSelectedId("");
     setReasoning("");
     setPracticeResult(null);
     setPracticeMode(true);
   }
-  const locked = !user || user.role !== "student" || checking || Boolean(loadError) || saving || (Boolean(attempt) && !practiceMode) || expired;
-  const shownResult = practiceResult ? { ...attempt, ...practiceResult } : attempt;
-  const loginLink = <Link to="/login" state={{ from: `/museum/exhibits/${exhibit.slug}` }}>Log in to answer</Link>;
+  const locked =
+    !user ||
+    user.role !== "student" ||
+    checking ||
+    Boolean(loadError) ||
+    saving ||
+    (Boolean(attempt) && !practiceMode) ||
+    expired;
+  const shownResult = practiceResult
+    ? { ...attempt, ...practiceResult }
+    : attempt;
+  const loginLink = (
+    <Link to="/login" state={{ from: `/museum/exhibits/${exhibit.slug}` }}>
+      Log in to answer
+    </Link>
+  );
 
   return (
     <div className="exhibit-page container">
-      <Link
-        className="exhibit-page__back"
-        to={`/museum/${exhibit.roomSlug}`}
-      >
+      <Link className="exhibit-page__back" to={`/museum/${exhibit.roomSlug}`}>
         ← Back to room
       </Link>
 
       <header className="exhibit-page__header">
         <p className="exhibit-page__eyebrow">
-          Exhibit {String(exhibit.number).padStart(3, "0")} ·{" "}
-          {exhibit.topic}
+          Exhibit {String(exhibit.number).padStart(3, "0")} · {exhibit.topic}
         </p>
 
         <h1>{exhibit.title}</h1>
@@ -138,10 +155,7 @@ async function handleSubmit(event) {
       </header>
 
       <div className="exhibit-page__grid">
-        <section
-          className="exhibit-panel"
-          aria-labelledby="question-title"
-        >
+        <section className="exhibit-panel" aria-labelledby="question-title">
           <h2 id="question-title">The question</h2>
 
           <p
@@ -157,84 +171,161 @@ async function handleSubmit(event) {
           </div>
 
           <p className="exhibit-page__hint">
-            This answer is intentionally incorrect. Your challenge
-            is to understand why.
+            This answer is intentionally incorrect. Your challenge is to
+            understand why.
           </p>
         </section>
 
-        <section
-          className="exhibit-panel"
-          aria-labelledby="challenge-title"
-        >
+        <section className="exhibit-panel" aria-labelledby="challenge-title">
           <h2 id="challenge-title">Your turn to rethink</h2>
 
           <form onSubmit={handleSubmit}>
-          {practiceMode && <p className="attempt-note">Practice round — your first answer stays saved. This round is not saved.</p>}
-          <fieldset className="exhibit-page__options" disabled={locked}>
-            <legend>Where did the thinking go wrong?</legend>
+            {practiceMode && (
+              <p className="attempt-note">
+                Practice round — your first answer stays saved. This round is
+                not saved.
+              </p>
+            )}
+            <fieldset className="exhibit-page__options" disabled={locked}>
+              <legend>Where did the thinking go wrong?</legend>
 
-            {exhibit.options.map((option) => (
-              <label
-                key={option.id}
-                className={`exhibit-page__option ${
-                  selectedId === option.id
-                    ? "exhibit-page__option--selected"
-                    : ""
-                }`}
-              >
-                <input
-                  type="radio"
-                  name={`answer-${exhibit.slug}`}
-                  value={option.id}
-                  checked={selectedId === option.id}
-                  onChange={() => setSelectedId(option.id)}
+              {exhibit.options.map((option) => (
+                <label
+                  key={option.id}
+                  className={`exhibit-page__option ${
+                    selectedId === option.id
+                      ? "exhibit-page__option--selected"
+                      : ""
+                  }`}
+                >
+                  <input
+                    type="radio"
+                    name={`answer-${exhibit.slug}`}
+                    value={option.id}
+                    checked={selectedId === option.id}
+                    onChange={() => setSelectedId(option.id)}
+                  />
+
+                  <span>{option.text}</span>
+                </label>
+              ))}
+            </fieldset>
+
+            {!attempt && (
+              <>
+                <label
+                  className="exhibit-page__reason-label"
+                  htmlFor="reasoning"
+                >
+                  What made you choose it?{" "}
+                  <span className="text-muted">(optional)</span>
+                </label>
+
+                <textarea
+                  id="reasoning"
+                  className="exhibit-page__reason"
+                  value={reasoning}
+                  onChange={(event) => setReasoning(event.target.value)}
+                  placeholder="Walk us through your thinking..."
+                  maxLength={1000}
+                  rows={4}
+                  disabled={locked}
                 />
+              </>
+            )}
 
-                <span>{option.text}</span>
-              </label>
-            ))}
-          </fieldset>
-
-          {!attempt && <><label
-            className="exhibit-page__reason-label"
-            htmlFor="reasoning"
-          >
-            What made you choose it?{" "}
-            <span className="text-muted">(optional)</span>
-          </label>
-
-          <textarea
-            id="reasoning"
-            className="exhibit-page__reason"
-            value={reasoning}
-            onChange={(event) => setReasoning(event.target.value)}
-            placeholder="Walk us through your thinking..."
-            maxLength={1000}
-            rows={4}
-            disabled={locked}
-          /></>}
-
-          {!user && <p className="attempt-note">{loginLink} to save your answer and see the explanation.</p>}
-          {user && user.role !== "student" && <p className="attempt-note">Teacher accounts can browse. Learning attempts are for student accounts.</p>}
-          {checking && <p role="status">Checking your previous attempt…</p>}
-          {loadError && <div className="attempt-error" role="alert"><p>{loadError}</p>
-            {expired ? loginLink : <button type="button" className="attempt-button" onClick={() => setRetryCount((n) => n + 1)}>Try again</button>}
-          </div>}
-          {submitError && <div className="attempt-error" role="alert"><p>{submitError}</p>{expired && loginLink}</div>}
-          {user?.role === "student" && (!attempt || practiceMode) && <button type="submit" className="attempt-button" disabled={locked || !selectedId}>
-            {saving ? "Saving your thinking…" : practiceMode ? "Check this try →" : "Check my thinking →"}
-          </button>}
+            {!user && (
+              <p className="attempt-note">
+                {loginLink} to save your answer and see the explanation.
+              </p>
+            )}
+            {user && user.role !== "student" && (
+              <p className="attempt-note">
+                Teacher accounts can browse. Learning attempts are for student
+                accounts.
+              </p>
+            )}
+            {checking && <p role="status">Checking your previous attempt…</p>}
+            {loadError && (
+              <div className="attempt-error" role="alert">
+                <p>{loadError}</p>
+                {expired ? (
+                  loginLink
+                ) : (
+                  <button
+                    type="button"
+                    className="attempt-button"
+                    onClick={() => setRetryCount((n) => n + 1)}
+                  >
+                    Try again
+                  </button>
+                )}
+              </div>
+            )}
+            {submitError && (
+              <div className="attempt-error" role="alert">
+                <p>{submitError}</p>
+                {expired && loginLink}
+              </div>
+            )}
+            {user?.role === "student" && (!attempt || practiceMode) && (
+              <button
+                type="submit"
+                className="attempt-button"
+                disabled={locked || !selectedId}
+              >
+                {saving
+                  ? "Saving your thinking…"
+                  : practiceMode
+                    ? "Check this try →"
+                    : "Check my thinking →"}
+              </button>
+            )}
           </form>
-          {shownResult && !practiceMode && <div className={`attempt-result ${shownResult.isCorrect ? "attempt-result--correct" : "attempt-result--rethink"}`} role="status" aria-live="polite">
-            <p className="attempt-result__label">{practiceResult ? "PRACTICE RESULT · NOT SAVED" : "FIRST ATTEMPT SAVED"}</p>
-            <h3>{shownResult.isCorrect ? "You found the mistake." : "A useful moment to rethink."}</h3>
-            {!practiceResult && attempt.selectedOptionFeedback && <p className="attempt-result__choice-feedback"><strong>About your choice:</strong> {attempt.selectedOptionFeedback}</p>}
-            <p><strong>The correct diagnosis:</strong> {attempt.correctOptionText}</p>
-            <p>{attempt.explanation}</p>
-            <p className="attempt-note">{practiceResult ? "Your original answer is still saved. Practice rounds do not change it." : "Your first answer is saved. This result will still be here when you return."}</p>
-            <button type="button" className="attempt-button" onClick={handlePractice}>Try again ↺</button>
-            <Link to={`/museum/${exhibit.roomSlug}`}>Explore another exhibit →</Link>
-          </div>}
+          {shownResult && !practiceMode && (
+            <div
+              className={`attempt-result ${shownResult.isCorrect ? "attempt-result--correct" : "attempt-result--rethink"}`}
+              role="status"
+              aria-live="polite"
+            >
+              <p className="attempt-result__label">
+                {practiceResult
+                  ? "PRACTICE RESULT · NOT SAVED"
+                  : "FIRST ATTEMPT SAVED"}
+              </p>
+              <h3>
+                {shownResult.isCorrect
+                  ? "You found the mistake."
+                  : "A useful moment to rethink."}
+              </h3>
+              {!practiceResult && attempt.selectedOptionFeedback && (
+                <p className="attempt-result__choice-feedback">
+                  <strong>About your choice:</strong>{" "}
+                  {attempt.selectedOptionFeedback}
+                </p>
+              )}
+              <p>
+                <strong>The correct diagnosis:</strong>{" "}
+                {attempt.correctOptionText}
+              </p>
+              <p>{attempt.explanation}</p>
+              <p className="attempt-note">
+                {practiceResult
+                  ? "Your original answer is still saved. Practice rounds do not change it."
+                  : "Your first answer is saved. This result will still be here when you return."}
+              </p>
+              <button
+                type="button"
+                className="attempt-button"
+                onClick={handlePractice}
+              >
+                Try again ↺
+              </button>
+              <Link to={`/museum/${exhibit.roomSlug}`}>
+                Explore another exhibit →
+              </Link>
+            </div>
+          )}
         </section>
       </div>
     </div>
@@ -258,10 +349,7 @@ function ExhibitLoader({ exhibitId }) {
       setNotFound(false);
 
       try {
-        const data = await getExhibit(
-          exhibitId,
-          controller.signal
-        );
+        const data = await getExhibit(exhibitId, controller.signal);
 
         if (controller.signal.aborted) return;
 
@@ -272,10 +360,10 @@ function ExhibitLoader({ exhibitId }) {
         if (error.status === 404) {
           setNotFound(true);
         } else {
-          toast.error("We couldn't load this exhibit. Please try again.", { toastId: `exhibit-load-${exhibitId}` });
-          setError(
-            "We couldn't load this exhibit. Please try again."
-          );
+          toast.error("We couldn't load this exhibit. Please try again.", {
+            toastId: `exhibit-load-${exhibitId}`,
+          });
+          setError("We couldn't load this exhibit. Please try again.");
         }
       } finally {
         if (!controller.signal.aborted) {
@@ -318,18 +406,32 @@ function ExhibitLoader({ exhibitId }) {
     );
   }
 
-  if (auth.loading) return <p className="container" role="status">Checking your session…</p>;
-  if (auth.error) return <div className="container"><p role="alert">{auth.error}</p><button type="button" onClick={auth.retry}>Retry session</button></div>;
-  return exhibit ? <ExhibitChallenge key={`${exhibit.slug}:${auth.user?.id || "guest"}`} exhibit={exhibit} user={auth.user} /> : null;
+  if (auth.loading)
+    return (
+      <p className="container" role="status">
+        Checking your session…
+      </p>
+    );
+  if (auth.error)
+    return (
+      <div className="container">
+        <p role="alert">{auth.error}</p>
+        <button type="button" onClick={auth.retry}>
+          Retry session
+        </button>
+      </div>
+    );
+  return exhibit ? (
+    <ExhibitChallenge
+      key={`${exhibit.slug}:${auth.user?.id || "guest"}`}
+      exhibit={exhibit}
+      user={auth.user}
+    />
+  ) : null;
 }
 
 export default function ExhibitPage() {
   const { exhibitId } = useParams();
 
-  return (
-    <ExhibitLoader
-      key={exhibitId}
-      exhibitId={exhibitId}
-    />
-  );
+  return <ExhibitLoader key={exhibitId} exhibitId={exhibitId} />;
 }

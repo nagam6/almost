@@ -26,9 +26,7 @@ export default function MistakePreview() {
   const [selectedId, setSelectedId] = useState("");
   const [isRevealed, setIsRevealed] = useState(false);
 
-  const selectedOption = options.find(
-    (option) => option.id === selectedId
-  );
+  const selectedOption = options.find((option) => option.id === selectedId);
 
   const isCorrect = selectedId === "different-base";
 
@@ -51,17 +49,13 @@ export default function MistakePreview() {
       aria-labelledby="preview-title"
     >
       <div className="mistake-preview__intro">
-        <p className="mistake-preview__eyebrow">
-          A little preview
-        </p>
+        <p className="mistake-preview__eyebrow">A little preview</p>
 
-        <h2 id="preview-title">
-          Looks right. Is it?
-        </h2>
+        <h2 id="preview-title">Looks right. Is it?</h2>
 
         <p>
-          Step into your first exhibit. Follow the reasoning,
-          then find the mistake.
+          Step into your first exhibit. Follow the reasoning, then find the
+          mistake.
         </p>
       </div>
 
@@ -73,24 +67,17 @@ export default function MistakePreview() {
         <h3>The discount that came back?</h3>
 
         <p>
-          A bag costs ₪100. Its price drops by 20%, then
-          the new price rises by 20%. What is the final price?
+          A bag costs ₪100. Its price drops by 20%, then the new price rises by
+          20%. What is the final price?
         </p>
 
         <div className="mistake-preview__wrong-answer">
-          <p className="mistake-preview__label">
-            The incorrect solution
-          </p>
-          <p>
-            “₪100. Minus 20%, plus 20% — they cancel out.”
-          </p>
+          <p className="mistake-preview__label">The incorrect solution</p>
+          <p>“₪100. Minus 20%, plus 20% — they cancel out.”</p>
         </div>
 
         <form onSubmit={handleSubmit}>
-          <fieldset
-            className="mistake-preview__choices"
-            disabled={isRevealed}
-          >
+          <fieldset className="mistake-preview__choices" disabled={isRevealed}>
             <legend>Where did the thinking go wrong?</legend>
 
             {options.map((option) => (
@@ -144,8 +131,8 @@ export default function MistakePreview() {
               </p>
 
               <p>
-                <strong>The final price is ₪96.</strong>{" "}
-                The key is asking: “20% of which amount?”
+                <strong>The final price is ₪96.</strong> The key is asking: “20%
+                of which amount?”
               </p>
             </div>
           )}
