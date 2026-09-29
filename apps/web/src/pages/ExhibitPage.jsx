@@ -7,6 +7,7 @@ import "./ExhibitPage.css";
 import "./ExhibitAttempt.css";
 import { useAuth } from "../components/AuthProvider";
 import { getMyAttempt, submitAttempt } from "../services/attemptsApi";
+import { playCorrect, playWrong } from "../services/sounds";
 
 function ExhibitChallenge({ exhibit, user }) {
   const [selectedId, setSelectedId] = useState("");
@@ -43,37 +44,67 @@ function ExhibitChallenge({ exhibit, user }) {
     return () => controller.abort();
   }, [exhibit.slug, user?.id, retryCount]);
 
-  async function handleSubmit(event) {
-    event.preventDefault();
-    if (submitting.current || !selectedId || !user || user.role !== "student" || checking || loadError || expired) return;
-    if (attempt) {
-      if (!practiceMode) return;
-      setPracticeResult({
-        selectedOptionId: selectedId,
-        isCorrect: selectedId === attempt.correctOptionId,
-      });
-      setPracticeMode(false);
-      toast.info("Practice round complete. Your first answer stays saved.");
-      return;
-    }
-    submitting.current = true;
-    setSaving(true); setSubmitError("");
-    try {
-  const data = await submitAttempt(exhibit.slug, {
-  selectedOptionId: selectedId,
-  reasoning,
-  exhibitVersion: exhibit.version,
-});
-      setAttempt(data.attempt);
-      toast.success("Your first answer is saved.");
-      setSelectedId(data.attempt.selectedOptionId);
-      setReasoning(data.attempt.reasoning || "");
-    } catch (error) {
-      setSubmitError(error.message);
-      toast.error(error.message);
-      if (error.status === 401) setExpired(true);
-    } finally { submitting.current = false; setSaving(false); }
+async function handleSubmit(event) {
+  event.preventDefault();
+
+  if (
+    submitting.current ||
+    !selectedId ||
+    !user ||
+    user.role !== "student" ||
+    checking ||
+    loadError ||
+    expired
+  ) return;
+
+  if (attempt) {
+    if (!practiceMode) return;
+
+    const isCorrect = selectedId === attempt.correctOptionId;
+
+    setPracticeResult({
+      selectedOptionId: selectedId,
+      isCorrect,
+    });
+    setPracticeMode(false);
+
+    if (isCorrect) playCorrect();
+    else playWrong();
+
+    toast.info("Practice round complete. Your first answer stays saved.");
+    return;
   }
+
+  submitting.current = true;
+  setSaving(true);
+  setSubmitError("");
+
+  try {
+    const data = await submitAttempt(exhibit.slug, {
+      selectedOptionId: selectedId,
+      reasoning,
+      exhibitVersion: exhibit.version,
+    });
+
+    setAttempt(data.attempt);
+    setSelectedId(data.attempt.selectedOptionId);
+    setReasoning(data.attempt.reasoning || "");
+
+    if (!data.alreadySubmitted) {
+      if (data.attempt.isCorrect) playCorrect();
+      else playWrong();
+    }
+
+    toast.success("Your first answer is saved.");
+  } catch (error) {
+    setSubmitError(error.message);
+    toast.error(error.message);
+    if (error.status === 401) setExpired(true);
+  } finally {
+    submitting.current = false;
+    setSaving(false);
+  }
+}
   function handlePractice() {
     setSelectedId("");
     setReasoning("");
