@@ -37,32 +37,29 @@ export default function AiCodeLab() {
     }
   }
 
-// اضافه-الصوت
-
   function playCorrectSound() {
-  const audioContext = new (
-    window.AudioContext || window.webkitAudioContext
-  )();
+    const audioContext = new (
+      window.AudioContext || window.webkitAudioContext
+    )();
 
-  const oscillator = audioContext.createOscillator();
-  const gain = audioContext.createGain();
+    const oscillator = audioContext.createOscillator();
+    const gain = audioContext.createGain();
 
-  oscillator.connect(gain);
-  gain.connect(audioContext.destination);
+    oscillator.connect(gain);
+    gain.connect(audioContext.destination);
 
-  oscillator.type = "sine";
-  oscillator.frequency.value = 800;
+    oscillator.type = "sine";
+    oscillator.frequency.value = 800;
 
-  gain.gain.setValueAtTime(0.3, audioContext.currentTime);
-  gain.gain.exponentialRampToValueAtTime(
-    0.01,
-    audioContext.currentTime + 0.4
-  );
+    gain.gain.setValueAtTime(0.3, audioContext.currentTime);
+    gain.gain.exponentialRampToValueAtTime(
+      0.01,
+      audioContext.currentTime + 0.4,
+    );
 
-  oscillator.start();
-  oscillator.stop(audioContext.currentTime + 0.4);
-}
-
+    oscillator.start();
+    oscillator.stop(audioContext.currentTime + 0.4);
+  }
 
   async function checkAnswer(event) {
     event.preventDefault();
@@ -81,8 +78,6 @@ export default function AiCodeLab() {
           : { correctedLine: editedLine }),
       });
 
-      // النتيجه من هون
-
       setResult(feedback);
 
       if (feedback.correct) {
@@ -91,13 +86,15 @@ export default function AiCodeLab() {
         playWrong();
       }
 
- 
-      toast[feedback.correct ? "success" : "info"](feedback.correct ? "You caught the AI's mistake." : "Almost. Take another look at the explanation.");
+      toast[feedback.correct ? "success" : "info"](
+        feedback.correct
+          ? "You caught the AI's mistake."
+          : "Almost. Take another look at the explanation.",
+      );
 
       if (feedback.correct) {
         playCorrectSound();
       }
-
     } catch (caught) {
       setError(caught.message);
       toast.error(caught.message);
@@ -119,8 +116,8 @@ export default function AiCodeLab() {
         <p className="museum-room-page__eyebrow">AI CODE LAB</p>
         <h2 id="ai-lab-title">The AI got close. You get it right.</h2>
         <p>
-          The AI made one mistake in this short piece of code. Find it,
-          then show what should change.
+          The AI made one mistake in this short piece of code. Find it, then
+          show what should change.
         </p>
       </div>
 
@@ -137,8 +134,7 @@ export default function AiCodeLab() {
 
       {error && (
         <p className="ai-lab__note" role="alert">
-          {error}{" "}
-          {loginRequired && <Link to="/login">Log in to continue</Link>}
+          {error} {loginRequired && <Link to="/login">Log in to continue</Link>}
         </p>
       )}
 
@@ -162,8 +158,8 @@ export default function AiCodeLab() {
 
               {challenge.source === "reviewed" && (
                 <p className="ai-lab__note">
-                  The AI is temporarily unavailable, so we opened a
-                  reviewed challenge for you.
+                  The AI is temporarily unavailable, so we opened a reviewed
+                  challenge for you.
                 </p>
               )}
             </div>
@@ -178,9 +174,7 @@ export default function AiCodeLab() {
               >
                 <button
                   type="button"
-                  className={
-                    answerMode === "choose" ? "is-active" : ""
-                  }
+                  className={answerMode === "choose" ? "is-active" : ""}
                   aria-pressed={answerMode === "choose"}
                   onClick={() => changeMode("choose")}
                 >
@@ -199,17 +193,11 @@ export default function AiCodeLab() {
 
               <form onSubmit={checkAnswer}>
                 {answerMode === "choose" ? (
-                  <fieldset
-                    className="ai-lab__options"
-                    disabled={loading}
-                  >
+                  <fieldset className="ai-lab__options" disabled={loading}>
                     <legend>What did the AI get wrong?</legend>
 
                     {challenge.options.map((option) => (
-                      <label
-                        key={option.id}
-                        className="ai-lab__option"
-                      >
+                      <label key={option.id} className="ai-lab__option">
                         <input
                           type="radio"
                           name="ai-answer"
@@ -226,9 +214,7 @@ export default function AiCodeLab() {
                   </fieldset>
                 ) : (
                   <label className="ai-lab__edit">
-                    Replace only this line:{" "}
-                    <code>{challenge.wrongLine}</code>
-
+                    Replace only this line: <code>{challenge.wrongLine}</code>
                     <input
                       type="text"
                       value={editedLine}
@@ -242,10 +228,8 @@ export default function AiCodeLab() {
                       spellCheck={false}
                       disabled={loading}
                     />
-
                     <small>
-                      We check your line as text. Your code is never
-                      executed.
+                      We check your line as text. Your code is never executed.
                     </small>
                   </label>
                 )}
@@ -267,9 +251,7 @@ export default function AiCodeLab() {
               {result && (
                 <div
                   className={`ai-lab__result ${
-                    result.correct
-                      ? "ai-lab__result--correct"
-                      : ""
+                    result.correct ? "ai-lab__result--correct" : ""
                   }`}
                   role="status"
                   aria-live="polite"

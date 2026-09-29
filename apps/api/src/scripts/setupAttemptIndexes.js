@@ -13,10 +13,7 @@ async function setupAttemptIndexes() {
   try {
     await connectDB();
 
-    // One-time backfill for existing records.
-    // The native collection allows setting this immutable field
-    // only where it has never been stored.
-    const result = await Exhibit.collection.updateMany(
+       const result = await Exhibit.collection.updateMany(
       { version: { $exists: false } },
       { $set: { version: 1 } }
     );

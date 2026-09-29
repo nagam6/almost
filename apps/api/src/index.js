@@ -15,9 +15,10 @@ dotenv.config({
   path: fileURLToPath(new URL("../.env", import.meta.url)),
 });
 
-
 if (!process.env.AUTH_SECRET || process.env.AUTH_SECRET.length < 32) {
-  throw new Error("Set AUTH_SECRET to a random value of at least 32 characters.");
+  throw new Error(
+    "Set AUTH_SECRET to a random value of at least 32 characters.",
+  );
 }
 if (!process.env.APP_URL) throw new Error("APP_URL is required.");
 const appOrigin = new URL(process.env.APP_URL);
@@ -47,9 +48,17 @@ app.get("/api/health", (_request, response) => {
 });
 
 app.use((error, _request, response, _next) => {
-  const status = error.status === 400 || error.status === 413 ? error.status : 500;
+  const status =
+    error.status === 400 || error.status === 413 ? error.status : 500;
   console.error("API request failed:", error.name);
-  response.status(status).json({ message: status === 500 ? "Something went wrong. Please try again." : "Invalid or oversized request." });
+  response
+    .status(status)
+    .json({
+      message:
+        status === 500
+          ? "Something went wrong. Please try again."
+          : "Invalid or oversized request.",
+    });
 });
 
 const port = Number(process.env.PORT) || 5000;
@@ -92,9 +101,7 @@ async function startServer() {
     process.on("SIGTERM", shutdown);
 
     server.on("error", () => {
-      console.error(
-        "HTTP server failed. Check whether the port is in use."
-      );
+      console.error("HTTP server failed. Check whether the port is in use.");
       shutdown();
     });
   } catch (error) {
