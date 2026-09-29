@@ -9,6 +9,7 @@ import { fileURLToPath } from "node:url";
 import { connectDB } from "./config/db.js";
 import roomsRouter from "./routes/roomRoutes.js";
 import exhibitRoutes from "./routes/exhibitRoutes.js";
+import aiRoutes from "./routes/aiRoutes.js";
 
 dotenv.config({
   path: fileURLToPath(new URL("../.env", import.meta.url)),
@@ -33,6 +34,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/rooms", roomsRouter);
 app.use("/api/exhibits", exhibitRoutes);
 app.use("/api/teacher", teacherRoutes);
+app.use("/api/ai", aiRoutes);
 
 app.get("/api/health", (_request, response) => {
   const isConnected = mongoose.connection.readyState === 1;
