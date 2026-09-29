@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, useParams } from "react-router-dom";
+import { toast } from "react-toastify";
 import { getExhibit } from "../services/api";
 import NotFoundPage from "./NotFoundPage";
 import "./ExhibitPage.css";
@@ -35,6 +36,7 @@ function ExhibitChallenge({ exhibit, user }) {
       .catch((error) => {
         if (controller.signal.aborted) return;
         setLoadError(error.message);
+        toast.error(error.message, { toastId: `attempt-load-${exhibit.slug}` });
         if (error.status === 401) setExpired(true);
       })
       .finally(() => { if (!controller.signal.aborted) setChecking(false); });
@@ -51,6 +53,7 @@ function ExhibitChallenge({ exhibit, user }) {
         isCorrect: selectedId === attempt.correctOptionId,
       });
       setPracticeMode(false);
+      toast.info("Practice round complete. Your first answer stays saved.");
       return;
     }
     submitting.current = true;
@@ -62,10 +65,12 @@ function ExhibitChallenge({ exhibit, user }) {
   exhibitVersion: exhibit.version,
 });
       setAttempt(data.attempt);
+      toast.success("Your first answer is saved.");
       setSelectedId(data.attempt.selectedOptionId);
       setReasoning(data.attempt.reasoning || "");
     } catch (error) {
       setSubmitError(error.message);
+      toast.error(error.message);
       if (error.status === 401) setExpired(true);
     } finally { submitting.current = false; setSaving(false); }
   }
@@ -236,6 +241,7 @@ function ExhibitLoader({ exhibitId }) {
         if (error.status === 404) {
           setNotFound(true);
         } else {
+          toast.error("We couldn't load this exhibit. Please try again.", { toastId: `exhibit-load-${exhibitId}` });
           setError(
             "We couldn't load this exhibit. Please try again."
           );

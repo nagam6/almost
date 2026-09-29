@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { toast } from "react-toastify";
 import { getRooms } from "../services/api";
 import "./MuseumPage.css";
 
@@ -24,6 +25,7 @@ export default function MuseumPage() {
         }
       } catch {
         if (!controller.signal.aborted) {
+          toast.error("We couldn’t load the rooms. Please try again.", { toastId: "museum-rooms-load" });
           setError(
             "We couldn’t load the rooms. Please try again."
           );

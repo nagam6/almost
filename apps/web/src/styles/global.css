@@ -184,3 +184,17 @@ textarea {
     scroll-behavior: auto !important;
   }
 }
+
+/* Short action messages share the museum's colors. */
+.Toastify__toast {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  color: var(--color-text);
+  box-shadow: var(--shadow-card);
+  font-family: inherit;
+}
+.Toastify__toast--success { border-inline-start: 4px solid var(--color-success); }
+.Toastify__toast--error { border-inline-start: 4px solid var(--color-error); }
+.Toastify__toast--info { border-inline-start: 4px solid var(--color-primary); }
+.Toastify__close-button { color: var(--color-text); }

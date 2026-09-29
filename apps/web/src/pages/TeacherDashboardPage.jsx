@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { toast } from "react-toastify";
 import { useAuth } from "../components/AuthProvider";
 import { teacherRequest } from "../services/teacherApi";
 import "./Teacher.css";
@@ -21,7 +22,7 @@ export default function TeacherDashboardPage() {
     Promise.all([
       teacherRequest(`/exhibits?page=${page}`, { signal: controller.signal }),
       teacherRequest("/summary", { signal: controller.signal }),
-    ]).then(([list, insight]) => setData({ ...list, summary: insight.summary })).catch((err) => { if (err.name !== "AbortError") setError(err.message); });
+    ]).then(([list, insight]) => setData({ ...list, summary: insight.summary })).catch((err) => { if (err.name !== "AbortError") { setError(err.message); toast.error(err.message, { toastId: "teacher-dashboard-load" }); } });
     return () => controller.abort();
   }, [page, refresh]);
   return <main className="container teacher-page">
