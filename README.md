@@ -57,7 +57,7 @@ Create `apps/api/.env` with your own values:
 PORT=5000
 MONGODB_URI=your_mongodb_connection_string
 AUTH_SECRET=your_random_secret_of_at_least_32_characters
-APP_URL=http://localhost:5173
+APP_URL=<your-production-url>
 
 # Required for Fix the AI:
 OPENAI_API_KEY=your_openai_api_key
