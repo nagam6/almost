@@ -66,7 +66,6 @@ export default function HomePage() {
 
           <div className="home-hero__artifact-bottom">
             <span>EVERY ERROR HAS A STORY</span>
-            <span aria-hidden="true">↗</span>
           </div>
         </aside>
       </section>
