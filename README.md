@@ -79,7 +79,7 @@ Start both apps:
 npm run dev
 ```
 
-- Website: [http://localhost:5173](http://localhost:5173)
+
 - API health check: [http://localhost:5000/api/health](http://localhost:5000/api/health)
 
 The frontend calls relative `/api` URLs. During development, Vite proxies those requests to the API.
