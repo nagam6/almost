@@ -465,8 +465,7 @@ async function generate(base, kind) {
       signal: AbortSignal.timeout(20_000),
       body: JSON.stringify({
         model:
-          process.env.OPENAI_MODEL ||
-          "gpt-4.1-mini",
+          process.env.OPENAI_MODEL,
         store: false,
         input: [
           {
