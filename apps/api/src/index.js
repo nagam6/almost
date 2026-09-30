@@ -6,9 +6,9 @@ dotenv.config({
   path: fileURLToPath(new URL("../.env", import.meta.url)),
 });
 
-import app from "./app.js";
-import User from "./models/User.js";
-import { connectDB } from "./config/db.js";
+const { default: app } = await import("./app.js");
+const { default: User } = await import("./models/User.js");
+const { connectDB } = await import("./config/db.js");
 
 const port = Number(process.env.PORT) || 5000;
 
@@ -51,7 +51,7 @@ async function startServer() {
 
     server.on("error", () => {
       console.error(
-        "HTTP server failed. Check whether the port is in use.",
+        "HTTP server failed. Check whether the port is in use."
       );
       shutdown();
     });
