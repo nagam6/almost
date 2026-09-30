@@ -37,73 +37,44 @@ export default function AiCodeLab() {
     }
   }
 
-  function playCorrectSound() {
-    const audioContext = new (
-      window.AudioContext || window.webkitAudioContext
-    )();
+ async function checkAnswer(event) {
+  event.preventDefault();
 
-    const oscillator = audioContext.createOscillator();
-    const gain = audioContext.createGain();
+  if (!challenge || loading) return;
 
-    oscillator.connect(gain);
-    gain.connect(audioContext.destination);
+  setLoading(true);
+  setError("");
 
-    oscillator.type = "sine";
-    oscillator.frequency.value = 800;
+  try {
+    const feedback = await checkAiChallenge({
+      token: challenge.token,
+      mode: answerMode === "choose" ? "choice" : "edit",
+      ...(answerMode === "choose"
+        ? { selectedOptionId }
+        : { correctedLine: editedLine }),
+    });
 
-    gain.gain.setValueAtTime(0.3, audioContext.currentTime);
-    gain.gain.exponentialRampToValueAtTime(
-      0.01,
-      audioContext.currentTime + 0.4,
-    );
+    setResult(feedback);
 
-    oscillator.start();
-    oscillator.stop(audioContext.currentTime + 0.4);
-  }
-
-  async function checkAnswer(event) {
-    event.preventDefault();
-
-    if (!challenge || loading) return;
-
-    setLoading(true);
-    setError("");
-
-    try {
-      const feedback = await checkAiChallenge({
-        token: challenge.token,
-        mode: answerMode === "choose" ? "choice" : "edit",
-        ...(answerMode === "choose"
-          ? { selectedOptionId }
-          : { correctedLine: editedLine }),
-      });
-
-      setResult(feedback);
-
-      if (feedback.correct) {
-        playCorrect();
-      } else {
-        playWrong();
-      }
-
-      toast[feedback.correct ? "success" : "info"](
-        feedback.correct
-          ? "You caught the AI's mistake."
-          : "Almost. Take another look at the explanation.",
-      );
-
-      if (feedback.correct) {
-        playCorrectSound();
-      }
-    } catch (caught) {
-      setError(caught.message);
-      toast.error(caught.message);
-      setLoginRequired(caught.status === 401);
-    } finally {
-      setLoading(false);
+    if (feedback.correct) {
+      playCorrect();
+    } else {
+      playWrong();
     }
-  }
 
+    toast[feedback.correct ? "success" : "info"](
+      feedback.correct
+        ? "You caught the AI's mistake."
+        : "Almost. Take another look at the explanation.",
+    );
+  } catch (caught) {
+    setError(caught.message);
+    toast.error(caught.message);
+    setLoginRequired(caught.status === 401);
+  } finally {
+    setLoading(false);
+  }
+}
   function changeMode(mode) {
     setAnswerMode(mode);
     setResult(null);

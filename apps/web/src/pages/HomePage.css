@@ -179,9 +179,6 @@
   border-top: 1px solid var(--color-border);
 }
 
-.home-hero__artifact-bottom span:last-child {
-  font-size: 1.2rem;
-}
 
 .home-how {
   padding-block: var(--space-8);
