@@ -1,3 +1,4 @@
+import dns from "node:dns";
 import mongoose from "mongoose";
 
 export async function connectDB() {
@@ -11,6 +12,15 @@ export async function connectDB() {
 
   if (mongoose.connection.readyState === 2) {
     return mongoose.connection.asPromise();
+  }
+
+  const dnsServers = process.env.MONGODB_DNS_SERVERS
+    ?.split(",")
+    .map((server) => server.trim())
+    .filter(Boolean);
+
+  if (dnsServers?.length) {
+    dns.setServers(dnsServers);
   }
 
   await mongoose.connect(process.env.MONGODB_URI, {
